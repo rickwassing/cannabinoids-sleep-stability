@@ -1,0 +1,236 @@
+% This code reproduces the findings reported in DOI: xxx.x.x.x
+
+% Author: Rick Wassing (rick.wassing@woolcock.org.au)
+
+% =========================================================================
+% INITIALIZE
+% -------------------------------------------------------------------------
+% Initialize Matlab, add code to path
+clear
+clc
+if ispc
+    cd('S:\Sleep\3. ACTIVE STUDIES\CUPID\Arousal paper backup_CANSLEEP')
+else
+    cd('/Volumes/sleep/Sleep/3. ACTIVE STUDIES/CUPID/Arousal paper backup_CANSLEEP')
+end
+addpath(genpath('code-paper'))
+if ispc
+    css_init('superpc');
+else
+    css_init('sleepdrive');
+end
+
+%% =========================================================================
+% To run this code parallel on multiple computers
+% -----------------------------------------------------------------------
+do_parallel = false;
+% -------------------------------------------------------------------------
+% Check which computers to run this on (true, false)
+hosts = {...
+    'Sleeps-MacBook-Pro.local', true;  ... % MBP
+    'mnc.local', true;                 ... % Mac-n-Cheese
+    'wimr-hp-z6', true;                ... % Supercomputer #1
+    'WIMR-HP-Z6b', false;               ... % Supercomputer #2
+    'WIMR-HPZ8-01', true;              ... % Supercomputer #3
+    'WIMR-SUPERMICRO', false;          ... % SuperMicro
+    'WIMR-ZBOOK-01', true;             ... % Neurobiology Laptop
+    };
+% -------------------------------------------------------------------------
+% Extract which computer this is 'idx_host'
+if do_parallel
+    % Remove the hosts that the user did not want to include
+    hosts = hosts([hosts{:, 2}], 1);
+    % Get the host name of this computer
+    [~, this_host] = system('hostname');
+    this_host = strtrim(this_host);
+    % Check that this host is in the list
+    idx_host = find(strcmpi(this_host, hosts(:, 1)));
+    if isempty(idx_host)
+        error('Host ''%s'' not specified', this_host);
+    end
+else
+    hosts = {}; %#ok<UNRCH> 
+    this_host = '';
+end
+
+%%
+
+% =========================================================================
+% PROCESSING: Load full PSG recording, 
+% -------------------------------------------------------------------------
+% Extract EEG and apply filter and downsample, also extract instantaneous
+% heart rate, and save original ECG signal
+% Save as 'desc-preproc', 'desc-preprochr', and 'desc-preprocecg'
+% -------------------------------------------------------------------------
+Proc = {'preproc'};
+Files = dir('derivatives/EEG-inspect/sub-*/**/sub-*desc-inspect_eeg.set');
+cfg = struct();
+cfg.do_parallel = do_parallel;
+cfg.hosts = hosts;
+cfg.this_host = this_host;
+cfg.derivativeout = 'EEG-preproc';
+cfg.kv.desc = {'preproc'};
+cfg.kv.filetype = {'eeg'};
+errors = section(Proc, Files, cfg);
+
+%% =========================================================================
+% PROCESSING: Calculate metrics on entire recording
+% -------------------------------------------------------------------------
+% Extract spindle events (Wamsley, Farrerilli, and Fernandez)
+% Save as 'desc-spindlewam', 'desc-spindlefli', and 'desc-spindlefdz'
+% -------------------------------------------------------------------------
+% Extract sigma, theta and delta power fluctuations
+% Save as 'desc-sigma', 'desc-theta', and 'desc-delta'
+% -------------------------------------------------------------------------
+Proc = {...
+    'detectspindlesusingfernandez', ...
+    'detectspindlesusingferrarelli', ...
+    'detectspindlesusingwamsley', ...
+    'getsigmapowerusingwavelet', ...
+    'getthetapowerusingwavelet', ...
+    'getdeltapowerusingwavelet', ...
+    };
+Files = dir('derivatives/EEG-preproc/sub-*/ses-*/sub-*desc-preproc_eeg.set');
+cfg = struct();
+cfg.do_parallel = do_parallel;
+cfg.hosts = hosts;
+cfg.this_host = this_host;
+cfg.derivativeout = 'EEG-processed';
+cfg.kv.desc = {'spindlefdz', 'spindlefli', 'spindlewam', 'sigma', 'theta', 'delta'};
+cfg.kv.filetype = {'boxcar', 'boxcar', 'boxcar', 'pow', 'pow', 'pow'};
+errors = section(Proc, Files, cfg);
+
+%% =========================================================================
+% INSPECT: Inspect spindles
+Proc = {'inspectspindles'};
+Files = dir('derivatives/EEG-preproc/sub-*/ses-*/sub-*desc-preproc_eeg.set');
+cfg = struct();
+cfg.do_parallel = do_parallel;
+cfg.hosts = hosts;
+cfg.this_host = this_host;
+cfg.derivativeout = 'n/a';
+errors = section(Proc, Files, cfg);
+
+%% =========================================================================
+% PROCESSING: Segment
+% -------------------------------------------------------------------------
+% Segment in 300-second (or longer) bouts of continuous N2 sleep (allowing
+% 1 epoch of non-stage-2 sleep).
+% Save as 'desc-<desc>nrembout'
+% -------------------------------------------------------------------------
+% Segment 300-second bouts of pre-REM sleep episodes (irrespective of the
+% sleep stage).
+% Save as 'desc-<desc>prerembout'
+% -------------------------------------------------------------------------
+% Segment bouts of pre-arousal N2 sleep (-100 to +30 seconds, allowing 1 
+% epoch of wake or 2 epochs of any other sleep stage).
+% Save as 'desc-<desc>n2arobout'
+% -------------------------------------------------------------------------
+Proc = {'extractnrembouts', 'extractprerembouts', 'extractnremarousals'};
+Files = dir('derivatives/EEG-processed/sub-*/ses-*/sub-*.set'); % any processed file
+cfg = struct();
+cfg.do_parallel = do_parallel;
+cfg.hosts = hosts;
+cfg.this_host = this_host;
+cfg.derivativeout = 'EEG-segmented';
+cfg.kv.desc = {'<desc>nrembout', '<desc>prerembout', '<desc>nremarobout'};
+cfg.kv.filetype = {'<filetype>', '<filetype>', '<filetype>'};
+errors = section(Proc, Files, cfg);
+%% -------------------------------------------------------------------------
+% Segment in 300-second (or longer) bouts of continuous N2 sleep (allowing
+% 1 epoch of non-stage-2 sleep).
+% Save as 'desc-<desc>nrembout'
+Proc = {'extractnrembouts', 'extractprerembouts', 'extractnremarousals'};
+Files = dir('derivatives/EEG-preproc/sub-*/ses-*/sub-*desc-preprochr_hr*.set'); % HR files
+cfg = struct();
+cfg.do_parallel = do_parallel;n
+cfg.hosts = hosts;
+cfg.this_host = this_host;
+cfg.derivativeout = 'EEG-segmented';
+cfg.kv.desc = {'hrnrembout', 'hrprerembout', 'hrnremarobout'};
+cfg.kv.filetype = {'<filetype>', '<filetype>', '<filetype>'};
+errors = section(Proc, Files, cfg);
+
+Proc = {'extractnrembouts', 'extractprerembouts', 'extractnremarousals'};
+Files = dir('derivatives/EEG-preproc/sub-*/ses-*/sub-*desc-preprocecg_ecg*.set'); % HR files
+cfg = struct();
+cfg.do_parallel = do_parallel;
+cfg.hosts = hosts;
+cfg.this_host = this_host;
+cfg.derivativeout = 'EEG-segmented';
+cfg.kv.desc = {'ecgnrembout', 'ecgprerembout', 'ecgnremarobout'};
+cfg.kv.filetype = {'<filetype>', '<filetype>', '<filetype>'};
+errors = section(Proc, Files, cfg);
+
+%% =========================================================================
+% PROCESSING: Get ISF parameters (amplitude, mean frequency, bandwidth)
+% -------------------------------------------------------------------------
+% Load the 300-second (or more) NREM bouts, and fit the infraslow
+% fluctuation powerspectrum to this data
+% Save as 'desc-<desc>isffit'
+Proc = {'infraslowfluctpowerspect_norm', 'infraslowfluctpowerspect_abs'};
+Files = dir('derivatives/EEG-segmented/sub-*/ses-*/sub-*_desc-sigmanrembout*.set'); % 300-second NREM bouts
+cfg = struct();
+cfg.do_parallel = do_parallel;
+cfg.hosts = hosts;
+cfg.this_host = this_host;
+cfg.derivativeout = 'EEG-output-fstlvl';
+cfg.kv.desc = {'a1cnormsigma', 'a1cabssigma'};
+cfg.kv.filetype = {'fstlvl', 'fstlvl'};
+errors = section(Proc, Files, cfg);
+
+%% =========================================================================
+% PROCESSING: Perform cross correlation between sigma and HR
+% -------------------------------------------------------------------------
+% Save as first-level output
+Proc = {'crosscorr'};
+Files = dir('derivatives/EEG-segmented/sub-*/ses-*/sub-*_desc-sigmanrembout*.set'); % 300-second NREM bouts
+cfg = struct();
+cfg.do_parallel = do_parallel;
+cfg.hosts = hosts;
+cfg.this_host = this_host;
+cfg.derivativeout = 'EEG-output-fstlvl';
+cfg.kv.desc = {'nremboutxcorr120s'};
+cfg.kv.filetype = {'fstlvl'};
+errors = section(Proc, Files, cfg);
+
+%% =========================================================================
+% ANALYSE:
+% -------------------------------------------------------------------------
+% Use 300-second bouts of continuous N2 sleep to describe the sigma/spindle
+% ISF between conditions:
+% - Describe selected bouts (average number, duration, number of interrupting
+%   epochs of each sleep stage, proportion of N1 and wake epochs captured
+%   within these bouts)
+css_analyse_1a();
+% - Sigma power/spindle density is similar between conditions
+css_analyse_1b();
+% - CBN modulates sigma/spindle ISF in terms of its amplitude, mean 
+%   frequency and bandwidth (variability).
+% - Sigma ISF and HR have a positive cross-correlation.
+% - CBN modulates the x-corr between ISF and HR
+css_analyse_1c();
+% -------------------------------------------------------------------------
+
+
+
+
+% Use the the 130-second pre-arousal bouts of continuous N2 sleep to 
+% determine the phase angle, amplitude (hilbert?) between state-shift 
+% arousals and continued sleep arousals; and whether CBN modulates this
+% - State-shift arousals occur after the sigma ISF peak, and
+%   continued-sleep arousals occur prior to the peak.
+% - State-shift arousals occur at higher ISF amplitudes (hilbert?)
+% - CBN increases the number of arousals to after the peak, or at higher
+%   ISF amplitudes
+% -------------------------------------------------------------------------
+% Use the 130 second pre-REM sleep episode bouts of continuous N2 sleep to
+% determine whether the sigma ISF cycle length (time to last peak)
+% correlates with REM episode duration
+% - Show that REM episode onset occurs at the ascending arm of the ISF.
+% - Sort the ISM fluctuation curves by REM episode duration (raster plot).
+% - Linear model of REM duration predicted by ISM cycle length x condition.
+% Other thoughts
+% - Is REM episode bout duration different? or NREM bout duration? No:
+% this does not provide evidence that LC activity may be enhanced during 
+% NREM sleep that prevents REM entries.

@@ -1,0 +1,496 @@
+clear
+Files = dir('derivatives/EEG-preproc/sub-*/ses-*/sub-*_desc-sigmaaroboutnrem2_eeg.set');
+% -------------------------------------------------------------------------
+% Chanlocs and surface
+chanlocs = template_to_chanlocs(which('GSN-HydroCel-257.sfp'));
+[~, eegsystem] = ishdeeg({chanlocs.labels});
+incl = hdeeg_scalpchannels(eegsystem);
+chanlocs = chanlocs(ismember({chanlocs.labels}, incl));
+surface = chanlocs2surface(...
+    fullfile('group-level/lme_prearousalsigma_placebo/input', 'surface.srf'), ...
+    fullfile('group-level/lme_prearousalsigma_placebo/input', 'chanlocs.sfp'), false, false);
+% -------------------------------------------------------------------------
+% Load the phenotype file
+PHEN = readtable('Scoring log and notes_CANSLEEP arousal.xlsx');
+
+ARO = struct(); % Output structure;
+warnings = struct();
+w = 0; % warning counter
+for i = 1:length(Files)
+    % Load data
+    EEG = LoadDataset(fullfile(Files(i).folder, Files(i).name), 'all');
+    EEG = pop_select(EEG, 'channel', find(strcmpi({EEG.chanlocs.type}, 'eeg')));
+    % Extact condition
+    kv = filename2struct(EEG.setname);
+    idx_phen = strcmpi(PHEN.folder_name, kv.sub);
+    cond = lower(PHEN.condition{idx_phen});
+    % Store data in output struct
+    ARO(i).filename = EEG.filename;
+    ARO(i).filepath = EEG.filepath;
+    ARO(i).suborig = kv.sub;
+    ARO(i).sub = kv.sub(1:4);
+    ARO(i).ses = kv.ses;
+    ARO(i).cond = cond;
+    % Demean
+    boundaries = round([EEG.event(strcmpi({EEG.event.type}, 'boundary')).latency, EEG.pnts]);
+    for j = 1:length(boundaries)
+        if j == 1
+            idx = [1, boundaries(j)];
+        else
+            idx = [boundaries(j-1)+1, boundaries(j)];
+        end
+        aw = pop_select(EEG, 'point', idx);
+        aw.data = detrend(aw.data', 0, 'omitnan')';
+        EEG.data(:, idx(1):idx(2)) = aw.data;
+    end
+    % Replace NaN's with zeros
+    for j = 1:EEG.nbchan
+        EEG.data(j, isnan(EEG.data(j, :))) = 0;
+    end
+    % Filter in the ISO freq range
+    % TODO: but only consider the pre-arousal part, otherwise the increase
+    % in sigma power at the onset of the arousal will become part of the
+    % analytical signal.
+    fcutoff = [0.01, 0.04];
+    forder = pop_firwsord('hamming', EEG.srate, 0.0025);
+    ISO = pop_firws(EEG, ...
+        'fcutoff', fcutoff, ...
+        'ftype', 'bandpass', ...
+        'wtype', 'hamming', ...
+        'forder', forder, ...
+        'usefftfilt', 1, ...
+        'minphase', 0);
+    % Extract phase angle for each arousal event where the preceeding time
+    % does not contain another arousal
+    H = hilbert(ISO.data')';
+    ANG = angle(H);
+    ARO(i).ang = [];
+    ARO(i).event = struct([]);
+    e = 0; % event counter
+    for j = 1:length(boundaries)
+        if j == 1
+            idx_bound = [1, boundaries(j)];
+        else
+            idx_bound = [boundaries(j-1)+1, boundaries(j)];
+        end
+        idx_aro = ...
+            ismember({ISO.event.type}, {'arousal', 'arousalemg'}) & ...
+            [ISO.event.latency] >= boundaries(j) - 30.1 * ISO.srate & ...
+            [ISO.event.latency] <= boundaries(j) - 29.9 * ISO.srate;
+        if not(any(idx_aro))
+            w = w+1;
+            warnings(w).msg = 'Arousal not found';
+            warnings(w).file = Files(i).name;
+            warnings(w).event = j;
+            warnings(w).total = length(boundaries);
+            continue
+        elseif sum(idx_aro) > 1
+            error('More than one arousal found');
+        end
+        % Check that no other arousal occurred prior
+        idx_preevent = [ISO.event.latency] >= idx_bound(1) & [ISO.event.latency] < ISO.event(idx_aro).latency;
+        preevents = {ISO.event(idx_preevent).type};
+        if any(ismember(preevents, {'arousal', 'arousalemg'}))
+            continue
+        end
+        e = e+1;
+        latency = ISO.event(idx_aro).latency;
+        ARO(i).ang = [ARO(i).ang, ANG(:, latency)];
+        ARO(i).event(e).latency = ISO.event(idx_aro).latency;
+        ARO(i).event(e).origlatency = ISO.event(idx_aro).origlatency;
+        ARO(i).event(e).duration = ISO.event(idx_aro).duration;
+        ARO(i).event(e).type = ISO.event(idx_aro).type;
+        ARO(i).event(e).stage = ISO.event(idx_aro).stage;
+        ARO(i).event(e).next_stage = ISO.event(idx_aro).next_stage;
+        ARO(i).event(e).is_awakening = ISO.event(idx_aro).is_awakening;
+    end
+end
+
+foutname = sprintf('group-level/%s_angle.mat', datestr(now, 'yyyymmddTHHMM'));
+save(foutname, 'ARO', '-mat', '-v7.3');
+
+%% Extract matrices for group level stats
+ANG = struct();
+ANG.evmean.plc.cs = [];
+ANG.evmean.plc.aw = [];
+ANG.evmean.etc.cs = [];
+ANG.evmean.etc.aw = [];
+ANG.submean.plc.cs = [];
+ANG.submean.plc.aw = [];
+ANG.submean.etc.cs = [];
+ANG.submean.etc.aw = [];
+for i = 1:length(ARO)
+    is_awake = [ARO(i).event.is_awakening];
+    switch ARO(i).cond
+        case 'placebo'
+            ANG.evmean.plc.cs = [ANG.evmean.plc.cs; ARO(i).ang(:, ~is_awake)'];
+            ANG.evmean.plc.aw = [ANG.evmean.plc.aw; ARO(i).ang(:, is_awake)'];
+            ANG.submean.plc.cs = [ANG.submean.plc.cs; circ_mean(ARO(i).ang(:, ~is_awake)')];
+            ANG.submean.plc.aw = [ANG.submean.plc.aw; circ_mean(ARO(i).ang(:, is_awake)')];
+        case 'etc120'
+            ANG.evmean.etc.cs = [ANG.evmean.etc.cs; ARO(i).ang(:, ~is_awake)'];
+            ANG.evmean.etc.aw = [ANG.evmean.etc.aw; ARO(i).ang(:, is_awake)'];
+            ANG.submean.etc.cs = [ANG.submean.etc.cs; circ_mean(ARO(i).ang(:, ~is_awake)')];
+            ANG.submean.etc.aw = [ANG.submean.etc.aw; circ_mean(ARO(i).ang(:, is_awake)')];
+    end
+end
+% Test for differences between CS and AW within each condition
+for i = 1:178
+    % Parametric Hotelling paired sample test for equal angular means.
+    [ANG.submean.plc.f_pval(i), ANG.submean.plc.f(i)] = circ_htest(ANG.submean.plc.aw(:, i), ANG.submean.plc.cs(:, i));
+    [ANG.submean.etc.f_pval(i), ANG.submean.etc.f(i)] = circ_htest(ANG.submean.etc.aw(:, i), ANG.submean.etc.cs(:, i));
+%     [ANG.submean.cs.f_pval(i), ANG.submean.cs.f(i)] = circ_htest(ANG.submean.etc.cs(:, i), ANG.submean.plc.cs(:, i));
+%     [ANG.submean.aw.f_pval(i), ANG.submean.aw.f(i)] = circ_htest(ANG.submean.etc.aw(:, i), ANG.submean.plc.aw(:, i));
+    % Rayleigh tests
+    [ANG.evmean.plc.rayleigh.pval_cs(i), ANG.evmean.plc.rayleigh.z_cs(i)] = circ_rtest(ANG.evmean.plc.cs(:, i));
+    [ANG.evmean.plc.rayleigh.pval_aw(i), ANG.evmean.plc.rayleigh.z_aw(i)] = circ_rtest(ANG.evmean.plc.aw(:, i));
+%     [ANG.evmean.etc.rayleigh.pval_cs(i), ANG.evmean.etc.rayleigh.z_cs(i)] = circ_rtest(ANG.evmean.etc.cs(:, i));
+%     [ANG.evmean.etc.rayleigh.pval_aw(i), ANG.evmean.etc.rayleigh.z_aw(i)] = circ_rtest(ANG.evmean.etc.aw(:, i));
+end
+
+% Permutation tests
+niter = 10000;
+nulldist_plc = nan(niter, 1);
+nulldist_etc = nan(niter, 1);
+% nulldist_cs = nan(niter, 1);
+% nulldist_aw = nan(niter, 1);
+shuffwithin = [1.*ones(19, 1), 2.*ones(19, 1)];
+shuffbetween = (1:19)';
+
+rt = now();
+for i = 1:niter
+    % Extact and shuffle data
+    depvar_plc = cat(3, ANG.submean.plc.aw, ANG.submean.plc.cs);
+    depvar_etc = cat(3, ANG.submean.etc.aw, ANG.submean.etc.cs);
+%     depvar_cs = cat(3, ANG.submean.etc.cs, ANG.submean.plc.cs);
+%     depvar_aw = cat(3, ANG.submean.etc.aw, ANG.submean.plc.aw);
+    if i > 1 % do not shuffle data on first iteration
+        idx_within = nan(19, 2);
+        for j = 1:19
+            idx_within(j, :) = randsample(shuffwithin(j, :), 2);
+            depvar_plc(j, :, :) = depvar_plc(j, :, idx_within(j, :));
+            depvar_etc(j, :, :) = depvar_etc(j, :, idx_within(j, :));
+%             depvar_cs(j, :, :) = depvar_cs(j, :, idx_within(j, :));
+%             depvar_aw(j, :, :) = depvar_aw(j, :, idx_within(j, :));
+        end
+        idx_between = randsample(shuffbetween, 19);
+        depvar_plc = depvar_plc(idx_between, :, :);
+        depvar_etc = depvar_etc(idx_between, :, :);
+%         depvar_cs = depvar_cs(idx_between, :, :);
+%         depvar_aw = depvar_aw(idx_between, :, :);
+    end
+    depvar1_plc = squeeze(depvar_plc(:, :, 1));
+    depvar2_plc = squeeze(depvar_plc(:, :, 2));
+    depvar1_etc = squeeze(depvar_etc(:, :, 1));
+    depvar2_etc = squeeze(depvar_etc(:, :, 2));
+%     depvar1_cs = squeeze(depvar_cs(:, :, 1));
+%     depvar2_cs = squeeze(depvar_cs(:, :, 2));
+%     depvar1_aw = squeeze(depvar_aw(:, :, 1));
+%     depvar2_aw = squeeze(depvar_aw(:, :, 2));
+    % Do the test
+    pval_plc = nan(178, 1);
+    fstat_plc = nan(178, 1);
+    pval_etc = nan(178, 1);
+    fstat_etc = nan(178, 1);
+%     pval_cs = nan(178, 1);
+%     fstat_cs = nan(178, 1);
+%     pval_aw = nan(178, 1);
+%     fstat_aw = nan(178, 1);
+    for j = 1:178
+        [pval_plc(j), fstat_plc(j)] = circ_htest(depvar1_plc(:, j), depvar2_plc(:, j));
+        [pval_etc(j), fstat_etc(j)] = circ_htest(depvar1_etc(:, j), depvar2_etc(:, j));
+%         [pval_cs(j), fstat_cs(j)] = circ_htest(depvar1_cs(:, j), depvar2_cs(:, j));
+%         [pval_aw(j), fstat_aw(j)] = circ_htest(depvar1_aw(:, j), depvar2_aw(:, j));
+    end
+    % Save statistic in null dist
+    pval_plc(pval_plc >= 0.05) = 1;
+    clust_plc = get_cluster(fstat_plc, pval_plc, 0.05, surface, chanlocs);
+    pval_etc(pval_etc >= 0.05) = 1;
+    clust_etc = get_cluster(fstat_etc, pval_etc, 0.05, surface, chanlocs);
+%     pval_cs(pval_cs >= 0.05) = 1;
+%     clust_cs = get_cluster(fstat_cs, pval_cs, 0.05, surface, chanlocs);
+%     pval_aw(pval_aw >= 0.05) = 1;
+%     clust_aw = get_cluster(fstat_aw, pval_aw, 0.05, surface, chanlocs);
+    if ~isempty(clust_plc)
+        nulldist_plc(i) = clust_plc(1).mass;
+    else
+        nulldist_plc(i) = max(fstat_plc);
+    end
+    if ~isempty(clust_etc)
+        nulldist_etc(i) = clust_etc(1).mass;
+    else
+        nulldist_etc(i) = max(fstat_etc);
+    end
+%     if ~isempty(clust_cs)
+%         nulldist_cs(i) = clust_cs(1).mass;
+%     else
+%         nulldist_cs(i) = max(fstat_cs);
+%     end
+%     if ~isempty(clust_aw)
+%         nulldist_aw(i) = clust_aw(1).mass;
+%     else
+%         nulldist_aw(i) = max(fstat_aw);
+%     end
+    rt = remainingTime(rt, niter);
+end
+
+pval_plc = ANG.submean.plc.f_pval;
+pval_plc(pval_plc >= 0.05) = 1;
+clust_plc = get_cluster(ANG.submean.plc.f, pval_plc, 0.05, surface, chanlocs);
+for i = 1:length(clust_plc)
+    clust_plc(i).p_clust = sum(clust_plc(i).mass <= nulldist_plc) / niter;
+end
+
+pval_etc = ANG.submean.etc.f_pval;
+pval_etc(pval_etc >= 0.05) = 1;
+clust_etc = get_cluster(ANG.submean.etc.f, pval_etc, 0.05, surface, chanlocs);
+for i = 1:length(clust_etc)
+    clust_etc(i).p_clust = sum(clust_etc(i).mass <= nulldist_etc) / niter;
+end
+
+% pval_cs = ANG.submean.cs.f_pval;
+% pval_cs(pval_cs >= 0.05) = 1;
+% clust_cs = get_cluster(ANG.submean.cs.f, pval_cs, 0.05, surface, chanlocs);
+% for i = 1:length(clust_cs)
+%     clust_cs(i).p_clust = sum(clust_cs(i).mass <= nulldist_cs) / niter;
+% end
+% 
+% pval_aw = ANG.submean.aw.f_pval;
+% pval_aw(pval_aw >= 0.05) = 1;
+% clust_aw = get_cluster(ANG.submean.aw.f, pval_aw, 0.05, surface, chanlocs);
+% for i = 1:length(clust_aw)
+%     clust_aw(i).p_clust = sum(clust_aw(i).mass <= nulldist_aw) / niter;
+% end
+
+%%
+
+ZData = [...
+    ANG.evmean.plc.rayleigh.z_aw, ...
+    ANG.evmean.plc.rayleigh.z_cs, ...
+    ANG.evmean.etc.rayleigh.z_aw, ...
+    ANG.evmean.etc.rayleigh.z_cs];
+PData = [...
+    ANG.evmean.plc.rayleigh.pval_aw, ...
+    ANG.evmean.plc.rayleigh.pval_cs, ...
+    ANG.evmean.etc.rayleigh.pval_aw, ...
+    ANG.evmean.etc.rayleigh.pval_cs];
+[MinZData, idx_min] = min(ZData);
+MinPData = PData(idx_min);
+
+aw = [...
+    ANG.evmean.plc.aw(:); ...
+    ANG.evmean.etc.aw(:); ...
+    ];
+cs = [...
+    ANG.evmean.plc.cs(:); ...
+    ANG.evmean.etc.cs(:); ...
+    ];
+mu_aw = circ_mean(aw);
+mu_cs = circ_mean(cs);
+sd_aw = circ_std(aw);
+sd_cs = circ_std(cs);
+
+aw_hist = [...
+    aw(aw > 0.5*pi)-2*pi;...
+    aw(aw < -0.5*pi)+2*pi;...
+    aw];
+cs_hist = [...
+    cs(cs > 0.5*pi)-2*pi;...
+    cs(cs < -0.5*pi)+2*pi;...
+    cs];
+
+% Sentences to copy-paste into manuscript
+fprintf('Rayleigh''s test for for non-uniformity indicated the data did not follow a uniform circular distribution (z > %.2f, p < %.8f).\n', MinZData, MinPData)
+fprintf('State-shift arousals occurred after the peak of the sigma ISO (mean [SD] %.2f [%.2f] radians), whereas arousals followed by continued sleep occured predominantly prior to the sigma ISO peak (%.2f [%.2f] radians).\n', mu_aw, sd_aw, mu_cs, sd_cs)
+
+CMapRoma = load('colormap_roma.mat');
+CMapRoma = CMapRoma.roma;
+CMapCirc = load('colormap_romao.mat');
+CMapCirc = CMapCirc.romaO;
+CMapCirc = [CMapCirc(193:end, :); CMapCirc(1:192, :)];
+
+chanlocs = template_to_chanlocs(which('GSN-HydroCel-257.sfp'));
+[~, system] = ishdeeg({chanlocs.labels});
+incl = hdeeg_scalpchannels(system);
+chanlocs = chanlocs(ismember({chanlocs.labels}, incl));
+
+close all
+clear Fig Ax CBar
+
+Fig = figure();
+Fig.Units = 'centimeters';
+Fig.Position(1:2) = [5, 5];
+Fig.Position(3:4) = [8, 8];
+
+% Topoplot for differences in phase angle between CS and AW in placebo
+YData = mean(ANG.submean.plc.cs);
+Ax(1) = axes(Fig);
+Ax(1).Position = [0/3, 0.25, 1/3, 1];
+topoplot(YData, chanlocs, ...
+    'contourvals', (YData > -0.5*pi) + (YData > 0) + (YData > 0.5*pi), ...
+    'numcontour', length(unique((YData > -0.5*pi) + (YData > 0) + (YData > 0.5*pi)))-1, ...    
+    'conv', 'on', ...
+    'whitebk', 'on');
+Ax(1).Title.String = 'CONT. SLEEP';
+Ax(1).Title.FontSize = 8;
+Ax(1).Title.FontWeight = 'normal';
+
+YData = mean(ANG.submean.plc.aw);
+Ax(2) = axes(Fig);
+Ax(2).Position = [1/3, 0.25, 1/3, 1];
+topoplot(YData, chanlocs, ...
+    'contourvals', (YData > -0.5*pi) + (YData > 0) + (YData > 0.5*pi), ...
+    'numcontour', length(unique((YData > -0.5*pi) + (YData > 0) + (YData > 0.5*pi)))-1, ...    
+    'conv', 'on', ...
+    'whitebk', 'on');
+Ax(2).Title.String = 'STATE SHIFT';
+Ax(2).Title.FontSize = 8;
+Ax(2).Title.FontWeight = 'normal';
+
+YData = ANG.submean.plc.f;
+EMarkers = find(ANG.submean.plc.f_pval < 0.05);
+fstats = finv([0.95, 0.99, 0.999], 1, 18);
+Ax(3) = axes(Fig);
+Ax(3).Position = [2/3, 0.25, 1/3, 1];
+topoplot(YData, chanlocs, ...
+    'emarker2', {EMarkers, '.', 'w', 8, 1}, ...
+    'contourvals', (YData > fstats(1)) + (YData > fstats(2)) + (YData > fstats(3)), ...
+    'numcontour', length(unique((YData > fstats(1)) + (YData > fstats(2)) + (YData > fstats(3))))-1, ...    
+    'conv', 'on', ...
+    'whitebk', 'on');
+Ax(3).Title.String = 'F-STAT';
+Ax(3).Title.FontSize = 8;
+Ax(3).Title.FontWeight = 'normal';
+
+% Topoplot for differences in phase angle between CS and AW in ETC120
+YData = mean(ANG.submean.etc.cs);
+Ax(4) = axes(Fig);
+Ax(4).Position = [0/3, -0.125, 1/3, 1];
+topoplot(YData, chanlocs, ...
+    'contourvals', (YData > -0.5*pi) + (YData > 0) + (YData > 0.5*pi), ...
+    'numcontour', length(unique((YData > -0.5*pi) + (YData > 0) + (YData > 0.5*pi)))-1, ...    
+    'conv', 'on', ...
+    'whitebk', 'on');
+
+YData = mean(ANG.submean.etc.aw);
+Ax(5) = axes(Fig);
+Ax(5).Position = [1/3, -0.125, 1/3, 1];
+topoplot(YData, chanlocs, ...
+    'contourvals', (YData > -0.5*pi) + (YData > 0) + (YData > 0.5*pi), ...
+    'numcontour', length(unique((YData > -0.5*pi) + (YData > 0) + (YData > 0.5*pi)))-1, ...    
+    'conv', 'on', ...
+    'whitebk', 'on');
+
+YData = ANG.submean.etc.f;
+EMarkers = find(ANG.submean.etc.f_pval < 0.05);
+fstats = finv([0.95, 0.99, 0.999], 1, 18);
+Ax(6) = axes(Fig);
+Ax(6).Position = [2/3, -0.125, 1/3, 1];
+topoplot(YData, chanlocs, ...
+    'emarker2', {EMarkers, '.', 'w', 8, 1}, ...
+    'contourvals', (YData > fstats(1)) + (YData > fstats(2)) + (YData > fstats(3)), ...
+    'numcontour', length(unique((YData > fstats(1)) + (YData > fstats(2)) + (YData > fstats(3))))-1, ...    
+    'conv', 'on', ...
+    'whitebk', 'on');
+
+Ax(1).Colormap = CMapCirc;
+Ax(1).CLim = [-0.5*pi, 0.5*pi];
+Ax(2).Colormap = CMapCirc;
+Ax(2).CLim = [-0.5*pi, 0.5*pi];
+Ax(4).Colormap = CMapCirc;
+Ax(4).CLim = [-0.5*pi, 0.5*pi];
+Ax(5).Colormap = CMapCirc;
+Ax(5).CLim = [-0.5*pi, 0.5*pi];
+
+Ax(3).Colormap = CMapRoma(129:end, :);
+Ax(3).CLim = [0, fstats(end)];
+Ax(6).Colormap = CMapRoma(129:end, :);
+Ax(6).CLim = [0, fstats(end)];
+
+CBar(1) = colorbar(Ax(1), 'south');
+CBar(1).Position = [0.1667, 0.13, 0.33, 0.04];
+CBar(1).Ticks = [-0.5*pi, 0 0.5*pi];
+CBar(1).TickLabels = {'ascend', 'peak', 'descend'};
+CBar(1).TickLength = 0.12;
+
+CBar(2) = colorbar(Ax(3), 'south');
+CBar(2).Position = [0.73, 0.13, 0.2, 0.04];
+CBar(2).Ticks = fstats;
+CBar(2).TickLabels = {'p < 0.05', 'p < 0.01', 'p < 0.001'};
+CBar(2).TickLength = 0.18;
+
+exportgraphics(Fig, 'figures/fig_4_phase_angle_topo.png', 'Resolution', 1200);
+
+close all
+clear Fig Ax CBar
+
+Fig = figure();
+Fig.Units = 'centimeters';
+Fig.Position(1:2) = [5, 5];
+Fig.Position(3:4) = [8, 6];
+
+Ax = axes(Fig);
+Ax.NextPlot = 'add';
+Ax.TickDir = 'out';
+Ax.Layer = 'top';
+Ax.Box = 'on';
+Ax.Position(4) = 0.70;
+Ax.Position(2) = 0.15;
+Ax.XLim = [-1.5*pi, 1.5*pi];
+Ax.XTick = [-pi, 0, pi];
+Ax.XTickLabel = {'trough', 'peak', 'trough'};
+Ax.YTick = 0:0.1:1;
+Ax.FontSize = 8;
+Ax.XLabel.String = 'Sigma ISO phase angle (rad)';
+Ax.XLabel.FontSize = 8;
+Ax.YLabel.String = 'Probability';
+Ax.YLabel.FontSize = 8;
+
+plot(Ax, -1.5*pi:pi/360:1.5*pi, 0.1.*(cos(-1.5*pi:pi/360:1.5*pi)+1.6), '-', 'Color', [0.6 0.6 0.6], ...
+    'LineWidth', 3)
+p(1) = histogram(cs_hist, 360, ...
+    'LineStyle', 'none', ...
+    'FaceColor', standard_colors('blue'), ...
+    'FaceAlpha', 0.5, ...
+    'Normalization', 'pdf');
+p(2) = histogram(aw_hist, 360, ...
+    'LineStyle', 'none', ...
+    'FaceColor', standard_colors('red'), ...
+    'FaceAlpha', 0.5, ...
+    'Normalization', 'pdf');
+
+Ax = polaraxes();
+Ax.Position = [0.18 0.53 0.25 0.25];
+polarhistogram(Ax, cs, 360, ...
+    'Normalization','probability', ...
+    'LineStyle', 'none', ...
+    'FaceColor', standard_colors('blue'), ...
+    'FaceAlpha', 0.3)
+hold on
+polarhistogram(Ax, aw, 360, ...
+    'Normalization','probability', ...
+    'LineStyle', 'none', ...
+    'FaceColor', standard_colors('red'), ...
+    'FaceAlpha', 0.3)
+polarplot(Ax, [mu_cs, mu_cs], [0, 0.0075], '-', 'Color', standard_colors('blue'))
+polarplot(Ax, [mu_aw, mu_aw], [0, 0.0075], '-', 'Color', standard_colors('red'))
+drawnow();
+Ax.RTick = [];
+Ax.ThetaDir = 'clockwise';
+Ax.ThetaZeroLocation = 'top';
+Ax.RTickLabel = {};
+Ax.FontSize = 8;
+Ax.ThetaTick = [0 90 180 270];
+Ax.ThetaTickLabel = {'peak', 'desc', 'trough', 'asc'};
+
+leg = legend(p, {...
+    sprintf('continued sleep (N = %i)', size(ANG.evmean.plc.cs, 1) + size(ANG.evmean.etc.cs, 1)), ...
+    sprintf('state shift (N = %i)', size(ANG.evmean.plc.aw, 1) + size(ANG.evmean.etc.aw, 1))}, ...
+    'Box', 'off', ...
+    'Location', 'northeast');
+leg.Position(2) = 1 - leg.Position(4);
+
+exportgraphics(Fig, 'figures/fig_4_phase_angle_dist.png', 'Resolution', 1200)
+
+close all
+clear Fig Ax CBar

@@ -1,0 +1,164 @@
+% function css_analyse_1b()
+% -------------------------------------------------------------------------
+% Visually inspect the IFS spectra and interpolate bad channels
+Files = dir('derivatives/EEG-output-fstlvl/sub-*/ses-*/sub-*_desc-a1c*sigma_fstlvl.mat');
+for i = 1:length(Files)
+    % Load data
+    ISF = LoadDataset(fullfile(Files(i).folder, Files(i).name), 'matrix');
+    % Interpolate bad channels (from visual inspection)
+    switch ISF.filename
+        case {'sub-r003_ses-etc120_task-psg_desc-a1cabssigma_fstlvl.mat', 'sub-r003_ses-etc120_task-psg_desc-a1cnormsigma_fstlvl.mat'}
+            badchans = 63;
+            ISF = interp_isfspectrum(ISF, badchans);
+        case {'sub-r005_ses-etc120_task-psg_desc-a1cabssigma_fstlvl.mat',  'sub-r005_ses-etc120_task-psg_desc-a1cnormsigma_fstlvl.mat'}
+            badchans = [59 60 129];
+            ISF = interp_isfspectrum(ISF, badchans);
+        case {'sub-r009_ses-etc120_task-psg_desc-a1cabssigma_fstlvl.mat', 'sub-r009_ses-etc120_task-psg_desc-a1cnormsigma_fstlvl.mat'}
+            badchans = 105;
+            ISF = interp_isfspectrum(ISF, badchans);
+        case {'sub-r012_ses-etc120_task-psg_desc-a1cabssigma_fstlvl.mat', 'sub-r012_ses-etc120_task-psg_desc-a1cnormsigma_fstlvl.mat'}
+            badchans = [10 34 65];
+            ISF = interp_isfspectrum(ISF, badchans);
+        case {'sub-r014_ses-etc120_task-psg_desc-a1cabssigma_fstlvl.mat', 'sub-r014_ses-etc120_task-psg_desc-a1cnormsigma_fstlvl.mat'}
+            badchans = 71;
+            ISF = interp_isfspectrum(ISF, badchans);
+            checked = true;
+        case {'sub-r016_ses-etc120_task-psg_desc-a1cabssigma_fstlvl.mat', 'sub-r016_ses-etc120_task-psg_desc-a1cnormsigma_fstlvl.mat'}
+            badchans = 31;
+            ISF = interp_isfspectrum(ISF, badchans);
+        case {'sub-r016_ses-placebo_task-psg_desc-a1cabssigma_fstlvl.mat', 'sub-r016_ses-placebo_task-psg_desc-a1cnormsigma_fstlvl.mat'}
+            badchans = 43;
+            ISF = interp_isfspectrum(ISF, badchans);
+        case {'sub-r017_ses-etc120_task-psg_desc-a1cabssigma_fstlvl.mat', 'sub-r017_ses-etc120_task-psg_desc-a1cnormsigma_fstlvl.mat'}
+            badchans = [72 80];
+            ISF = interp_isfspectrum(ISF, badchans);
+        case {'sub-r018_ses-etc120_task-psg_desc-a1cabssigma_fstlvl.mat', 'sub-r018_ses-etc120_task-psg_desc-a1cnormsigma_fstlvl.mat'}
+            badchans = [154 162 163 164 176 177];
+            ISF = interp_isfspectrum(ISF, badchans);
+        case {'sub-r019_ses-etc120_task-psg_desc-a1cabssigma_fstlvl.mat', 'sub-r019_ses-etc120_task-psg_desc-a1cnormsigma_fstlvl.mat'}
+            badchans = [45 53 60 77 78 79 87 113 114 178];
+            ISF = interp_isfspectrum(ISF, badchans);
+    end
+    % Save as new file
+    kv = filename2struct(ISF.filename);
+    kv.desc = [kv.desc, 'interp'];
+    ISF.filename = struct2filename(kv);
+    SaveDataset(ISF, 'matrix');
+end
+
+% Run the paired t-tests in the EEG Processor
+
+%% Cross correlate the Sigma power and HR timeseries
+Files = dir('derivatives/EEG-output-fstlvl/sub-*/ses-*/sub-*_desc-nremboutxcorr120s_fstlvl.mat');
+
+XC = [];
+for i = 1:length(Files)
+    tmp = LoadDataset(fullfile(Files(i).folder, Files(i).name), 'matrix');
+    if isempty(XC)
+        XC = tmp;
+    else
+        XC(i) = tmp;
+    end
+end
+
+% -------------------------------------------------------------------------
+% Placebo Spectra
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+% Create axes
+ai=0
+ai = ai+1;
+Ax(ai) = axes(...
+    'NextPlot', 'add', ...
+    'FontSize', 8, ...
+    'XTick', [X.times(1), 0, X.times(end)], ...
+    'YLim', [-0.3, 0.3], ...
+    'YTick', -1:0.1:1, ...
+    'XGrid', 'on', ...
+    'TickLength', [0 0], ...
+    'Box', 'on', ...
+    'Color', [0.96 0.97 0.99]);
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+% Extact X and Y-data
+idx_cond = strcmpi({XC.session}, 'placebo');
+XData = repmat([asrow(XC(1).times), nan], 1, 178);
+YData = cat(3, XC(idx_cond).data);
+YData = mean(YData, 3);
+YData = [YData'; nan(1, 178)];
+YData = ascolumn(YData(:));
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+% Plot as patch 
+patch(Ax(ai), 'XData', XData, 'YData', YData, ...
+    'EdgeColor', 'k', ...
+    'EdgeAlpha', 0.05, ...
+    'FaceColor', 'none');
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+% Set axes props
+Ax(ai).FontSize = 6;
+Ax(ai).Title.String = 'PLACEBO';
+Ax(ai).Title.FontWeight = 'normal';
+Ax(ai).Title.FontSize = 8;
+Ax(ai).XLabel.String = 'time lag (s)';
+Ax(ai).XLabel.FontSize = 8;
+Ax(ai).XTickLabelRotation = 0;
+Ax(ai).YLabel.String = 'amp. (a.u.)';
+Ax(ai).YLabel.FontSize = 8;
+
+%% Compare the number, duration and timing of the selected bouts
+Files = dir('derivatives/EEG-processed/sub-*/ses-*/sub-*_desc-sigma_pow.set');
+A = table();
+B = table();
+for i = 1:length(Files)
+    hdr = LoadDataset(fullfile(Files(i).folder, Files(i).name), 'header');
+    bouts = getnrembouts(css_eeglab2hypnogram(hdr), hdr.srate, 300);
+    kv = filename2struct(hdr.setname);
+    a = table();
+    a.sub = {kv.sub};
+    a.ses = {kv.ses};
+    a.nbouts = size(bouts, 1);
+    b = table();
+    for j = 1:size(bouts, 1)
+        tmp = table();
+        tmp.sub = {kv.sub};
+        tmp.ses = {kv.ses};
+        tmp.bout = j;
+        tmp.dur = bouts(j, 2) - bouts(j, 1);
+        tmp.onset = bouts(j, 1) / hdr.xmax;
+        if j == 1
+            b = tmp;
+        else
+            b = [b; tmp];
+        end
+    end
+    if i == 1
+        A = a;
+    else
+        A = [A; a];
+    end
+    B = [B; b];
+end
+writetable(A, 'group-level/nrembout_number.csv')
+writetable(B, 'group-level/nrembout_duration.csv')
+%%
+clc
+mdl = fitlme(A, 'nbouts ~ 1 + ses + (1|sub)');
+fprintf('**************************************************************\n')
+fprintf('No difference in the number of selected bouts (t(%i) = %.2f, p = %.2f).\n', ...
+    mdl.Coefficients.DF(2), ...
+    mdl.Coefficients.tStat(2), ...
+    mdl.Coefficients.pValue(2))
+mdl = fitlme(B, 'dur ~ 1 + ses + (1|sub)');
+fprintf('**************************************************************\n')
+fprintf('No difference in the duration of selected bouts (t(%i) = %.2f, p = %.2f).\n', ...
+    mdl.Coefficients.DF(2), ...
+    mdl.Coefficients.tStat(2), ...
+    mdl.Coefficients.pValue(2))
+mdl = fitlme(B, 'onset ~ 1 + ses + (1|sub)');
+fprintf('**************************************************************\n')
+fprintf('No difference in the time of the night of selected bouts (t(%i) = %.2f, p = %.2f).\n', ...
+    mdl.Coefficients.DF(2), ...
+    mdl.Coefficients.tStat(2), ...
+    mdl.Coefficients.pValue(2))
+
+%% Run the paired t-tests and create figures
+% No significant differences in ISF frequency, amplitude or total power
+css_plot_1c('abs')

@@ -1,0 +1,42 @@
+% This code reproduces the findings reported in 
+% DOI: xxx.x.x.x
+
+% Author: Rick Wassing (rick.wassing@woolcock.org.au)
+
+% =========================================================================
+% INITIALIZE
+% -------------------------------------------------------------------------
+% Initialize Matlab, add code to path
+cd('/Volumes/sleep/Sleep/3. ACTIVE STUDIES/CUPID/Arousal paper backup_CANSLEEP')
+addpath(genpath('code-paper'))
+css_init()
+
+%% =========================================================================
+% PROCESSING
+Files = dir('derivatives/EEG-preproc/sub-*/ses-*/sub-*_desc-preproc_eeg.set');
+errors = {};
+for i = length(Files)-1
+    try
+        css_proc(fullfile(Files(i).folder, Files(i).name));
+    catch ME
+        err.it = i;
+        err.File = Files(i);
+        err.ME = ME;
+        errors = [errors; {err}]; %#ok<AGROW>
+    end
+end
+
+% =========================================================================
+% ANALYSIS
+% -------------------------------------------------------------------------
+% Load individual hypnogram data
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+% Describe PSG sleep parameters
+% -------------------------------------------------------------------------
+% Load individual arousal data
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+% Describe arousal types (continued sleep vs state-shifts), when they occur, 
+
+
+
+
