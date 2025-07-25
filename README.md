@@ -1,4 +1,4 @@
-# Cannabinoids Sleep Stability Analysis
+# Sleep Stability Analysis
 
 ## Overview
 
