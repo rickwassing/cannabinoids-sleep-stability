@@ -141,6 +141,17 @@ errors = section(Proc, Files, cfg);
 % 1 epoch of non-stage-2 sleep).
 % Save as 'desc-<desc>nrembout'
 Proc = {'extractnrembouts', 'extractprerembouts', 'extractnremarousals'};
+Files = dir('derivatives/EEG-preproc/sub-*/ses-*/sub-*desc-preprochr_hr*.set'); % HR files
+cfg = struct();
+cfg.do_parallel = do_parallel;n
+cfg.hosts = hosts;
+cfg.this_host = this_host;
+cfg.derivativeout = 'EEG-segmented';
+cfg.kv.desc = {'hrnrembout', 'hrprerembout', 'hrnremarobout'};
+cfg.kv.filetype = {'<filetype>', '<filetype>', '<filetype>'};
+errors = section(Proc, Files, cfg);
+
+Proc = {'extractnrembouts', 'extractprerembouts', 'extractnremarousals'};
 Files = dir('derivatives/EEG-preproc/sub-*/ses-*/sub-*desc-preprocecg_ecg*.set'); % HR files
 cfg = struct();
 cfg.do_parallel = do_parallel;
@@ -175,12 +186,11 @@ errors = section(Proc, Files, cfg);
 Proc = {'crosscorr'};
 Files = dir('derivatives/EEG-segmented/sub-*/ses-*/sub-*_desc-sigmanrembout*.set'); % 300-second NREM bouts
 cfg = struct();
-cfg.force = true;
 cfg.do_parallel = do_parallel;
 cfg.hosts = hosts;
 cfg.this_host = this_host;
 cfg.derivativeout = 'EEG-output-fstlvl';
-cfg.kv.desc = {'xcorr'};
+cfg.kv.desc = {'nremboutxcorr120s'};
 cfg.kv.filetype = {'fstlvl'};
 errors = section(Proc, Files, cfg);
 
@@ -197,14 +207,10 @@ css_analyse_1a();
 css_analyse_1b();
 % - CBN modulates sigma/spindle ISF in terms of its amplitude, mean 
 %   frequency and bandwidth (variability).
-css_analyse_1c();
-% -------------------------------------------------------------------------
-
-
 % - Sigma ISF and HR have a positive cross-correlation.
 % - CBN modulates the x-corr between ISF and HR
-
-
+css_analyse_1c();
+% -------------------------------------------------------------------------
 % Use the the 130-second pre-arousal bouts of continuous N2 sleep to 
 % determine the phase angle, amplitude (hilbert?) between state-shift 
 % arousals and continued sleep arousals; and whether CBN modulates this
@@ -213,6 +219,9 @@ css_analyse_1c();
 % - State-shift arousals occur at higher ISF amplitudes (hilbert?)
 % - CBN increases the number of arousals to after the peak, or at higher
 %   ISF amplitudes
+css_analyse_2a(); % Determine the impact of the filter edge artefact on the phase estimate
+% css_analyse_2b(); TODO. Run the statistical analysis to show awakening
+% arousals occur at at different phase angle to continued arousal ones.
 % -------------------------------------------------------------------------
 % Use the 130 second pre-REM sleep episode bouts of continuous N2 sleep to
 % determine whether the sigma ISF cycle length (time to last peak)

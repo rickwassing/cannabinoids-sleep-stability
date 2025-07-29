@@ -211,10 +211,6 @@ css_analyse_1b();
 % - CBN modulates the x-corr between ISF and HR
 css_analyse_1c();
 % -------------------------------------------------------------------------
-
-
-
-
 % Use the the 130-second pre-arousal bouts of continuous N2 sleep to 
 % determine the phase angle, amplitude (hilbert?) between state-shift 
 % arousals and continued sleep arousals; and whether CBN modulates this
@@ -223,6 +219,9 @@ css_analyse_1c();
 % - State-shift arousals occur at higher ISF amplitudes (hilbert?)
 % - CBN increases the number of arousals to after the peak, or at higher
 %   ISF amplitudes
+css_analyse_2a(); % Determine the impact of the filter edge artefact on the phase estimate
+% css_analyse_2b(); TODO. Run the statistical analysis to show awakening
+% arousals occur at at different phase angle to continued arousal ones.
 % -------------------------------------------------------------------------
 % Use the 130 second pre-REM sleep episode bouts of continuous N2 sleep to
 % determine whether the sigma ISF cycle length (time to last peak)

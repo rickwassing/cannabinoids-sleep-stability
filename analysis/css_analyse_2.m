@@ -64,6 +64,8 @@ fcutoff = mean(fcutoff);
 H = struct();
 % For each bout, filter the full bout, and filter the bout minus the filter order
 
+ANGA = [];
+ANGB = [];
 DANG = [];
 DAMP = [];
 
@@ -119,6 +121,7 @@ for i = 1:length(SIGMA)
         H.a.sig = mean(tmp_a.data, 1)';
         H.a.sig = detrend(H.a.sig, 0);
         H.a.x = hilbert(H.a.sig);
+        H.a.sig = H.a.sig(1:end-2*forder);
         H.a.ang = angle(H.a.x(1:end-2*forder));
         H.a.amp = abs(H.a.x(1:end-2*forder));
 
@@ -128,10 +131,12 @@ for i = 1:length(SIGMA)
         H.b.ang = angle(H.b.x);
         H.b.amp = abs(H.b.x);
 
-        dang = asrow(mod(H.a.ang - H.b.ang + pi, 2*pi) - pi);
+        dang = asrow(circ_dist(H.a.ang, H.b.ang));
         damp = asrow(abs(H.a.amp - H.b.amp));
 
         % store the first 'forder' samples, and the last
+        ANGA = [ANGA; asrow(H.a.sig(end-4*forder+1:end))];
+        ANGB = [ANGB; asrow(H.b.sig(end-4*forder+1:end))];
         DANG = [DANG; dang(end-4*forder+1:end)];
         DAMP = [DAMP; damp(end-4*forder+1:end)];
 
@@ -139,26 +144,150 @@ for i = 1:length(SIGMA)
 end
 
 %%
-check = double(DANG(:, end));
-
-%%
+% -------------------------------------------------------------------------
 close all
-figure
+
+Fig = figure();
+Fig.Color = 'w';
+Fig.Units = 'centimeters';
+Fig.Position(3:4) = [18, 7];
+
+clear Ax
+ai = 0;
+
+% -------------------------------------------------------------------------
+% Plot the bars explaining the method
+ai = ai+1;
+Ax(ai) = axes();
+XData = 1:2;
+YData = [4000, 0, 0, 0; 0, 0, 4000, 2000];
+b = barh(XData, YData, 'stacked', 'BarWidth', 0.5);
+b(1).FaceColor = standard_colors('red');
+b(2).FaceColor = standard_colors('red').^0.2;
+b(3).FaceColor = standard_colors('blue');
+b(4).FaceColor = standard_colors('blue').^0.2;
+
+% Axis props
+Ax(ai).Box = 'off';
+Ax(ai).OuterPosition = [0/12 1-4/12 12/12 4/12] + [0 0 0.055 0];
+Ax(ai).YTickLabel = {'test signal', 'control signal'};
+Ax(ai).TickLength = [0, 0];
+Ax(ai).XTick = [0, 4000, 6000];
+Ax(ai).XTickLabel = {'-400', '0', '+200'};
+Ax(ai).XLabel.String = 'time (s)';
+Ax(ai).XAxisLocation = 'top';
+
+% -------------------------------------------------------------------------
+% Plot the control and test signals
+ai = ai+1;
+Ax(ai) = axes('NextPlot', 'add', 'Layer', 'top');
+
+patch(Ax(ai), 'XData', [3500 4000 4000 3500], 'YData', [-1 -1 1 1], 'LineStyle', 'none', 'FaceColor', [0.92 0.93 0.95])
+plot(1:size(ANGA,2), mean(ANGA, 1), '-', 'LineWidth', 1, 'Color', standard_colors('blue'))
+plot(1:size(ANGA,2), mean(ANGB, 1), '-', 'LineWidth', 1, 'Color', standard_colors('red'))
+
+% Axis props
+Ax(ai).Box = 'on';
+Ax(ai).OuterPosition = [0/12 1-7/12 8/12 3/12]+[0.0425 0 0.045 0];
+Ax(ai).TickLength = [0, 0];
+Ax(ai).XTick = [0, 3500, 4000];
+Ax(ai).XTickLabel = {'-400', '-50', '0'};
+Ax(ai).YLim = [-0.2 0.2];
+Ax(ai).YTick = [];
+
+% -------------------------------------------------------------------------
+% Plot a Zoom-in of the control and test signals
+ai = ai+1;
+Ax(ai) = axes('NextPlot', 'add', 'Color', [0.92 0.93 0.95]);
+
+plot(mean(ANGA(:, end-500:end), 1), '-', 'LineWidth', 1, 'Color', standard_colors('blue'))
+plot(mean(ANGB(:, end-500:end), 1), '-', 'LineWidth', 1, 'Color', standard_colors('red'))
+
+% Axis props
+Ax(ai).Box = 'on';
+Ax(ai).OuterPosition = [8/12 1-7/12 4/12 3/12]+[0.025 0 -0.04 0];
+Ax(ai).TickLength = [0, 0];
+Ax(ai).XLim = [0, 500];
+Ax(ai).XTick = 0:50:500;
+Ax(ai).XTickLabel = {'-50', '', '-40', '', '-30', '', '-20', '', '-10', '', '0'};
+Ax(ai).XTickLabelRotation = 0;
+Ax(ai).XGrid = 'on';
+Ax(ai).YLim = Ax(ai-1).YLim;
+Ax(ai).YTick = [];
+
+% -------------------------------------------------------------------------
+% Plot the difference in angle
+ai = ai+1;
+Ax(ai) = axes('NextPlot', 'add', 'Color', [0.92 0.93 0.95]);
+
+YData = DANG(:, end-500:end)';
+XData = repmat([0:500, nan], 1, size(YData, 1));
+YData = [YData; nan(1, size(YData, 2))];
+YData = YData(:);
+
+patch('XData', XData, 'YData', YData, 'EdgeColor', 'k', 'EdgeAlpha', 0.08);
+
+% Axis props
+Ax(ai).Box = 'on';
+Ax(ai).OuterPosition = [8/12 1-12/12 4/12 5/12]+[0.025 0 -0.04 0];
+Ax(ai).TickLength = [0, 0];
+Ax(ai).XLim = [0, 500];
+Ax(ai).XTick = [0, 500];
+Ax(ai).XTickLabel = {'-50', '0'};
+Ax(ai).YTick = [-pi, 0, pi];
+Ax(ai).YTickLabel = {'-\pi', '0', '\pi'};
+Ax(ai).YLim = [-3.6, 3.6];
+
+
+ai = ai + 1;
+Ax(ai) = polaraxes('NextPlot', 'add', 'Color', 'w');
+Ax(ai).ThetaTick = [0, 90, 180, 270];
+Ax(ai).ThetaTickLabel = {'0', '0.5\pi', '\pi', '1.5\pi'};
+Ax(ai).FontSize = 8;
+Ax(ai).RTick = [];
+Ax(ai).OuterPosition = [0 1-12/12 1.2/12 5/12] + [0 -0.0125 0.025 0.025];
+% -------------------------------------------------------------------------
+% Plot the radial distributions
+delay = [300 250 200 150 100 50 0];
+for i = 1:length(delay)-1
+    ai = ai + 1;
+    Ax(ai) = polaraxes('NextPlot', 'add', 'Color', [0.92 0.93 0.95]);
+    Ax(ai).OuterPosition = [(i)*1.175/12 1-12/12 1.2/12 5/12] + [0.01 0 0 0];
+    Ax(ai).ThetaTick = [0, 90, 180, 270];
+    Ax(ai).ThetaTickLabel = {};
+    Ax(ai).RTick = [];
+    Ax(ai).Title.String = sprintf('-%i to -%i s', delay(i)/10, delay(i+1)/10);
+    Ax(ai).Title.FontSize = 8;
+    Ax(ai).Title.FontWeight = 'normal';
+    Theta = DANG(:, (end-delay(i)+1):(end-delay(i+1)));
+    Theta = Theta(:);
+    h = polarhistogram(Ax(ai), Theta, 36, 'FaceColor', [0.5 0.5 0.5], 'EdgeColor', [0.5 0.5 0.5]);
+    polarplot(Ax(ai), [circ_mean(Theta), circ_mean(Theta)], [0 max(h.Values)], '-k', 'LineWidth', 1.5)
+    Ax(ai).RLim = [0, max(h.Values)];
+end
+
+exportgraphics(Fig, 'figures/supp_2.png', 'Resolution', 300)
+disp('Done saving')
+%%
+
+
+
+ai = ai+1;
+Ax(ai) = axes();
+Ax = axes('NextPlot', 'add');
 
 YData = [DANG'; nan(1, size(DANG, 1))];
 YData = YData(:);
 XData = repmat([1:4000, nan], 1, size(DANG,1));
-Ax = axes('NextPlot', 'add');
 patch('XData', XData, 'YData', YData, 'EdgeColor', 'k', 'EdgeAlpha', 0.08);
-plot(mean(DANG), '-k', 'LineWidth', 1.5)
-plot(prctile(DANG, 95), ':k', 'LineWidth', 1.5)
-plot(prctile(DANG, 5), ':k', 'LineWidth', 1.5)
+plot(circ_mean(DANG, [], 1), '-k', 'LineWidth', 1.5)
+plot(circ_mean(DANG, [], 1)+circ_std(DANG, [], [], 1), ':k', 'LineWidth', 1.5)
+plot(circ_mean(DANG, [], 1)-circ_std(DANG, [], [], 1), ':k', 'LineWidth', 1.5)
 plot([0, 4*forder], [-pi/8, -pi/8], '-r')
 plot([0, 4*forder], [pi/8, pi/8], '-r')
 Ax.XTick = 1:50:4*forder;
 Ax.XTickLabel = (Ax.XTick-4*forder-1)./10;
 Ax.YTick = -pi:0.25*pi:pi;
 
-figure;
 
-polarhistogram(circ_mean(DANG(:, end-100:end-50),[], 2), 36)
+% polarhistogram(circ_mean(DANG(:, end-100:end-50),[], 2), 36)
