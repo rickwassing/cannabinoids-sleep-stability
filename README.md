@@ -15,14 +15,6 @@ This repository contains the analysis code for a research project evaluating sle
 └── archive/              # Old stuff
 ```
 
-## Key Findings
-
-_[Results will be populated following analysis completion]_
-
-- Sleep stability effects
-- Statistical significance of observed changes
-- Clinical implications
-
 ## License
 
 This project is licensed under a **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License**.
@@ -51,12 +43,4 @@ See the [LICENSE](LICENSE) file for full license details or visit: https://creat
 
 ## Data Privacy and Ethics
 
-This research follows ethical guidelines for human subjects research. This repository only contains analysis code. All data is stored separately and can be requested.
-
-## Contributing
-
-This is a research project with specific analytical objectives. For questions about methodology or findings, please see contact details above.
-
----
-
-_This repository contains ongoing research. Results and interpretations are preliminary pending peer review and publication._
+This research follows ethical guidelines for human subjects research. HREC Approval was granted by Bellberry Ltd (2018-04-284). This repository only contains analysis code. All data is stored separately and can be requested.
