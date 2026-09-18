@@ -155,11 +155,23 @@ pass** — moving the whole file to `firstlevel-outcomes/` is sufficient to make
 at the folder level. Splitting internals is deferred/optional (see "Deferred / Optional" section).
 
 **Actions:**
-- [ ] Execute all `git mv` in the table above.
-- [ ] In moved `run_processing_section.m`: rename function declaration line `function [errors] = section(Proc, Files, cfg)` → `function [errors] = run_processing_section(Proc, Files, cfg)`.
-- [ ] `grep -rn "\bsection(" code/` and update every call site (expected: only `code/pipeline/main.m`) to `run_processing_section(...)`.
-- [ ] `grep -rn "'processing/\|processing/css_\|analysis/css_extractfeatures\|analysis/css_createfstlvloutput"` across `code/` and `documents/` (documents is out of scope for edits, just check) to catch stray path-string references in comments; update comments only (no path-string literals were found referencing these folders during planning, since file lookups use `dir('derivatives/...')` glob patterns, not `code/` paths — confirm this holds).
-- [ ] Verify `addpath(genpath('code'))` in `main.m` still resolves all functions (path-based dispatch is folder-agnostic; MATLAB doesn't care which subfolder a function lives in as long as it's on path) — no code changes needed for this, just confirm by reading `main.m`'s init block.
+- [x] Execute all `git mv` in the table above. **Note:** `code/analysis/css_extractfeatures.m`
+      as listed in the table above was a stale path from planning — on disk (confirmed via
+      `git log --follow`, present since the initial commit) this file has always lived at
+      `code/processing/css_extractfeatures.m`. Moved from its actual location; no other
+      discrepancy found.
+- [x] In moved `run_processing_section.m`: renamed function declaration line
+      `function [errors] = section(Proc, Files, cfg)` → `function [errors] = run_processing_section(Proc, Files, cfg)`.
+- [x] `grep -rn "\bsection(" code/` and updated every call site — all 9 were in
+      `code/pipeline/main.m` as expected, now `run_processing_section(...)`.
+- [x] `grep -rn "'processing/\|processing/css_\|analysis/css_extractfeatures\|analysis/css_createfstlvloutput"` across `code/` and `documents/` — **zero stray path-string references found** (confirmed: file lookups use `dir('derivatives/...')` glob patterns, not `code/` paths).
+- [x] Verified `addpath(genpath('code'))` in `main.m`'s init block still present and unchanged — path-based dispatch is folder-agnostic, no code changes needed.
+
+**Phase 2 completed 2026-09-18.** All moves via `git mv` (history preserved). No statistical
+method, model specification, threshold, filter parameter, or numeric result was changed — this
+was pure relocation plus the one approved function rename (`section` → `run_processing_section`).
+`code/processing/` is now drained of all `.m` files (only an empty, pre-existing, untracked
+`code/processing/archive/` and `.DS_Store` remain — directory removal deferred to Phase 6 per plan).
 
 **Skills/tools:** `run_commands` (`git mv`, `grep`), `editor` (function-name rename in `run_processing_section.m`, call-site updates). No MCP server needed.
 
@@ -458,7 +470,7 @@ Phases 1–5 (for the traceability table).
 
 - [x] Phase 0 — Setup (2026-09-18)
 - [x] Phase 1 — Archive consolidation (2026-09-18)
-- [ ] Phase 2 — Subject-level + first-level reorganisation
+- [x] Phase 2 — Subject-level + first-level reorganisation (2026-09-18)
 - [ ] Phase 3 — utils/ categorisation (+ batch confirmation of flagged items)
 - [ ] Phase 4 — Group-level reorganisation + script→function conversion
 - [ ] Phase 5 — main.m update

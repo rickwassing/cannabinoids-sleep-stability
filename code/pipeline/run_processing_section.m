@@ -1,4 +1,4 @@
-function [errors] = section(Proc, Files, cfg)
+function [errors] = run_processing_section(Proc, Files, cfg)
 % -------------------------------------------------------------------------
 % Init output variable
 errors = {};
@@ -163,10 +163,6 @@ for i = 1:length(Files)
                     param = struct();
                     param.outfilepath = fullfile(Files(i).outfolder, Files(i).outname{j});
                     css_preproc(EEG, param);
-                case 'detectarousals'
-                    param = struct();
-                    param.outfilepath = fullfile(Files(i).outfolder, Files(i).outname{j});
-                    css_detectarousals(EEG, param);
                 case 'detectspindlesusingfernandez'
                     param = struct();
                     param.method = 'fernandez';
