@@ -203,14 +203,14 @@ errors = run_processing_section(Proc, Files, cfg);
 % - Describe selected bouts (average number, duration, number of interrupting
 %   epochs of each sleep stage, proportion of N1 and wake epochs captured
 %   within these bouts)
-css_analyse_1a();
+analyse_bout_selection();
 % - Sigma power/spindle density is similar between conditions
-css_analyse_1b();
+analyse_sigma_spindle_similarity();
 % - CBN modulates sigma/spindle ISF in terms of its amplitude, mean 
 %   frequency and bandwidth (variability).
 % - Sigma ISF and HR have a positive cross-correlation.
 % - CBN modulates the x-corr between ISF and HR
-css_analyse_1c();
+analyse_isf_topography();
 % -------------------------------------------------------------------------
 % Use the the 130-second pre-arousal bouts of continuous N2 sleep to 
 % determine the phase angle, amplitude (hilbert?) between state-shift 
@@ -220,9 +220,8 @@ css_analyse_1c();
 % - State-shift arousals occur at higher ISF amplitudes (hilbert?)
 % - CBN increases the number of arousals to after the peak, or at higher
 %   ISF amplitudes
-css_analyse_2a(); % Determine the impact of the filter edge artefact on the phase estimate
-% css_analyse_2b(); TODO. Run the statistical analysis to show awakening
-% arousals occur at at different phase angle to continued arousal ones.
+analyse_filter_edge_artefact(); % Determine the impact of the filter edge artefact on the phase estimate
+analyse_arousal_isf_phase();
 % -------------------------------------------------------------------------
 % Use the 130 second pre-REM sleep episode bouts of continuous N2 sleep to
 % determine whether the sigma ISF cycle length (time to last peak)
@@ -234,3 +233,12 @@ css_analyse_2a(); % Determine the impact of the filter edge artefact on the phas
 % - Is REM episode bout duration different? or NREM bout duration? No:
 % this does not provide evidence that LC activity may be enhanced during 
 % NREM sleep that prevents REM entries.
+analyse_rem_transition_dynamics();
+% -------------------------------------------------------------------------
+% Compare sleep macroarchitecture (Table 1) and arousal outcomes (awakening
+% probability by duration/stage) between treatment conditions
+analyse_sleep_macroarchitecture_and_arousal_outcomes();
+% -------------------------------------------------------------------------
+% Supplementary/illustrative figure only (not a manuscript result in itself):
+% illustrates the sigma ISF phase-angle distribution methodology
+plot_isf_phase_distribution_illustration();

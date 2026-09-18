@@ -9,16 +9,23 @@ This repository is organized as a [Brain Imaging Data Structure (BIDS)](https://
 ## Project Structure
 
 ```
-├── code/                 # All analysis code (BIDS convention)
-│   ├── analysis/         # Code related to generating the results for the publication
-│   ├── processing/       # Code to load EEG data, process it, and extract relevant features
-│   ├── qc/               # Quality control
-│   ├── supportfunc/      # Re-usable support functions
-│   ├── toolboxes/        # Dependencies
-│   └── archive/          # Old stuff
-├── rawdata/              # BIDS raw data metadata (data itself stored separately)
-└── sourcedata/           # BIDS source data placeholder (data itself stored separately)
+├── code/                     # All analysis code (BIDS convention)
+│   ├── main.m                # Top-level orchestration script (run this to reproduce all results)
+│   ├── css_init.m            # Environment/path initialization
+│   ├── pipeline/             # Generic subject-level job runner (Proc/Files/cfg dispatch)
+│   ├── subject-level/        # Per-subject EEG processing (preprocessing, segmentation, spectral features)
+│   ├── firstlevel-outcomes/  # Functions that compute and save first-level (per-subject) outcome measures
+│   ├── group-level/          # Group-level statistical analyses, one subfolder per manuscript aim/figure
+│   ├── qc/                   # Quality control / visual inspection helpers
+│   ├── utils/                # Re-usable support functions, categorised by purpose
+│   ├── toolboxes/            # Third-party dependencies (untouched)
+│   └── archive/              # Superseded/scratch code, kept for provenance (pipeline/analysis/scratch)
+├── rawdata/                  # BIDS raw data metadata (data itself stored separately)
+└── sourcedata/               # BIDS source data placeholder (data itself stored separately)
 ```
+
+See [`code/README.md`](code/README.md) for a detailed traceability mapping between first-level
+outcomes, group-level analyses, and the manuscript's aims/figures/tables.
 
 ## License
 

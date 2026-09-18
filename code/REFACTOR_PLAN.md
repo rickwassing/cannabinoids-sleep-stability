@@ -479,7 +479,7 @@ download needed, it ships with MATLAB.
 ordering/labels), and the final renamed files from Phase 4 to get their exact new names/paths.
 
 **Actions:**
-- [ ] In the `% ANALYSE:` section of `main.m`, replace the current 5 calls
+- [x] In the `% ANALYSE:` section of `main.m`, replace the current 5 calls
       (`css_analyse_1a(); css_analyse_1b(); css_analyse_1c(); css_analyse_2a(); % css_analyse_2b();
       TODO...`) with calls to the renamed functions, in this order (matching manuscript aim order):
       `analyse_bout_selection();` → `analyse_sigma_spindle_similarity();` →
@@ -488,12 +488,41 @@ ordering/labels), and the final renamed files from Phase 4 to get their exact ne
       `analyse_sleep_macroarchitecture_and_arousal_outcomes();`
       (plus, as a clearly-labelled supplementary/illustrative call,
       `plot_isf_phase_distribution_illustration();` at the end).
-- [ ] Preserve every existing explanatory comment block above each call (these already describe
+- [x] Preserve every existing explanatory comment block above each call (these already describe
       the scientific purpose well) — only update the function name being called, not the prose.
-- [ ] Remove the stale `% TODO. Run the statistical analysis...` comment above the former
+- [x] Remove the stale `% TODO. Run the statistical analysis...` comment above the former
       `css_analyse_2b` line, since that TODO is now resolved by actually wiring the call in.
-- [ ] Update the top-of-file comment referencing `DOI: xxx.x.x.x` — leave as-is (out of scope;
+- [x] Update the top-of-file comment referencing `DOI: xxx.x.x.x` — leave as-is (out of scope;
       not a structural issue, and I don't have the actual DOI to fill in).
+
+**Phase 5 completed 2026-09-18.** Notes:
+- **Correction to this section's "Read first" line:** per the Phase 2 correction note above,
+  `main.m` was never actually moved to `code/pipeline/main.m` (it remains at `code/main.m`,
+  alongside `code/css_init.m`, as the accepted on-disk state) — edited `code/main.m` in place,
+  not `code/pipeline/main.m`.
+- All 8 calls now wired into `main.m`'s `% ANALYSE:` section in the exact order specified,
+  including the two that previously had **no call at all** in `main.m`
+  (`analyse_rem_transition_dynamics()` for `css_analyse_3.m`, and
+  `analyse_sleep_macroarchitecture_and_arousal_outcomes()` for `css_descriptives.m`) — resolving
+  approved decision Q3 (missing calls to the aim-2b/aim-3/descriptives analyses).
+  `plot_isf_phase_distribution_illustration()` added at the end as a clearly-labelled
+  supplementary/illustrative call (with a new one-line comment identifying it as such, since it
+  previously had no call site in `main.m` to preserve prose from).
+- Added one short new comment block (2 lines) above `analyse_sleep_macroarchitecture_and_arousal_outcomes();`
+  since `css_descriptives()` previously had no call site in `main.m` at all, so there was no
+  existing prose to preserve — the new text describes the call's purpose consistent with the
+  style of surrounding comment blocks (Table 1 / arousal-outcomes mapping) and does not alter or
+  invent scientific claims.
+- Stale `% css_analyse_2b(); TODO. Run the statistical analysis...` comment removed entirely,
+  replaced by a bare `analyse_arousal_isf_phase();` call — the TODO is resolved by wiring the
+  call in, per plan.
+- Top-of-file `DOI: xxx.x.x.x` comment confirmed unchanged.
+- `grep -rn` sweep for all 9 old function names across `code/*.m` confirms `code/main.m` is fully
+  clean; the only 2 remaining hits repo-wide are pre-existing header comments in already-archived
+  files (`code/archive/analysis/css_analyse_2.m`, `code/archive/analysis/css_plot_isffeatures.m`)
+  added during Phase 1 to document what superseded them — not functional references.
+- `git status --short` confirms only `code/main.m` was modified in this phase (`M`, not `R`,
+  since no file move was involved).
 
 **Skills/tools:** `editor` only. No MCP server needed.
 
@@ -506,11 +535,11 @@ ordering/labels), and the final renamed files from Phase 4 to get their exact ne
 Phases 1–5 (for the traceability table).
 
 **Actions:**
-- [ ] Update `README.md`'s "Project Structure" tree to reflect the new `code/` layout
+- [x] Update `README.md`'s "Project Structure" tree to reflect the new `code/` layout
       (`pipeline/`, `subject-level/`, `firstlevel-outcomes/`, `group-level/`, `utils/`, `qc/`,
       `toolboxes/`, `archive/`), replacing the old `analysis/processing/qc/supportfunc/archive`
       list.
-- [ ] Add a new `code/README.md` with two tables required by the original task's traceability
+- [x] Add a new `code/README.md` with two tables required by the original task's traceability
       goal:
       1. **First-level outcomes table**: for each file in `code/firstlevel-outcomes/`, columns =
          {function, what it's derived from, unit/interpretation, where saved (derivative folder +
@@ -518,17 +547,48 @@ Phases 1–5 (for the traceability table).
       2. **Group-level analysis → manuscript mapping table**: for each folder in
          `code/group-level/`, columns = {folder, manuscript aim/section, key figure/table
          number(s), main statistical method used}.
-- [ ] Run a final repo-wide `grep -rn` sweep for every old top-level folder name
+- [x] Run a final repo-wide `grep -rn` sweep for every old top-level folder name
       (`code/processing/`, `code/analysis/`, `code/supportfunc/`, `code/tmp/`) to confirm zero
       remaining path-string references anywhere in `code/` (comments included).
-- [ ] Confirm `code/processing/`, `code/analysis/`, `code/supportfunc/`, `code/tmp/` directories
+- [x] Confirm `code/processing/`, `code/analysis/`, `code/supportfunc/`, `code/tmp/` directories
       no longer exist (fully drained and removed) and `code/archive/` is the single consolidated
       archive location.
 - [ ] **Recommended external step (you, locally):** run
       `matlab.codetools.requiredFilesAndProducts('code/pipeline/main.m')` before and after the
       full refactor (keep the "before" list from a pre-refactor git stash/branch) and diff the two
       dependency lists — they should be identical in content (function names / logic), differing
-      only in file paths.
+      only in file paths. **Not executed** — no MATLAB CLI available in this environment (see
+      Tooling notes at top of this plan); left for you to run locally.
+
+**Phase 6 completed 2026-09-18.** Notes:
+- **Correction to this section's "Read first" line:** as in Phase 5, `code/pipeline/main.m` does
+  not exist — `main.m` remains at `code/main.m`. Both this plan's traceability documentation and
+  the root `README.md` reference `code/main.m` at its actual path.
+- Root `README.md`'s "Project Structure" tree rewritten to show `main.m`, `css_init.m`,
+  `pipeline/`, `subject-level/`, `firstlevel-outcomes/`, `group-level/`, `qc/`, `utils/`,
+  `toolboxes/`, `archive/` — replacing the stale `analysis/processing/qc/supportfunc/archive`
+  list — with a pointer to the new `code/README.md` for full traceability detail.
+- New `code/README.md` created with: a pipeline overview section, the required first-level
+  outcomes table (4 rows, one per file in `code/firstlevel-outcomes/`), the required group-level
+  → manuscript mapping table (6 rows, one per folder in `code/group-level/`), and a short "Notes
+  and known limitations" section consolidating the three items flagged-but-not-fixed during the
+  refactor (the `analysis_2a.mat` provenance note, the `N%%` typo, and the
+  `css_getsigmapowerusingwavelet`/`css_getspecpowerusingwavelet` duplication) so they remain
+  discoverable without having to read this entire plan file.
+- Final `grep -rn` sweep for `code/processing/`, `code/analysis/`, `code/supportfunc/`,
+  `code/tmp/` (as path-strings) across all `.m` files in `code/` — **zero matches**. (These
+  strings still appear, as expected, only within `code/REFACTOR_PLAN.md` itself, which is
+  historical planning documentation, not source code.)
+- Confirmed via `find`/`ls` that `code/processing/`, `code/analysis/`, `code/supportfunc/`,
+  `code/tmp/` no longer exist on disk. `code/processing/` had been left on disk since Phase 2
+  (containing only a gitignored `.DS_Store` and an empty, untracked `archive/` subfolder — no
+  tracked files) and was removed now via `rm -rf`, since it held nothing; `git status` was clean
+  both before and after this removal (nothing tracked was affected). `code/archive/` confirmed
+  as the single consolidated archive location, with exactly its three intended subfolders
+  (`pipeline/`, `analysis/`, `scratch/`).
+- The `matlab.codetools.requiredFilesAndProducts` before/after dependency diff was **not run**,
+  consistent with this plan's "Tooling notes" section — no MATLAB CLI is available in this
+  environment. Left as a recommended external step for you to run locally.
 
 **Skills/tools:** `editor`, `run_commands` (`grep`, `git status`). No MCP server needed.
 
@@ -559,7 +619,12 @@ Phases 1–5 (for the traceability table).
       2026-09-18 re: manual edits post-completion — see Phase 2 section)
 - [x] Phase 3 — utils/ categorisation (+ batch confirmation of flagged items) (2026-09-18)
 - [x] Phase 4 — Group-level reorganisation + script→function conversion (2026-09-18)
-- [ ] Phase 5 — main.m update
-- [ ] Phase 6 — README + final verification
+- [x] Phase 5 — main.m update (2026-09-18)
+- [x] Phase 6 — README + final verification (2026-09-18)
+
+**All phases complete as of 2026-09-18.** The one remaining item (running
+`matlab.codetools.requiredFilesAndProducts('code/main.m')` before/after and diffing dependency
+lists) requires a local MATLAB installation and is left as a recommended step for the repo owner
+— see Phase 6 notes above.
 
 
