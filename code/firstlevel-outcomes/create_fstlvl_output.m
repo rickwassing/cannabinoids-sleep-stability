@@ -1,4 +1,4 @@
-function EEG = css_createfstlvloutput(outfname, Features, DataStr)
+function EEG = create_fstlvl_output(outfname, Features, DataStr)
 
 if nargin < 3
     DataStr = [];

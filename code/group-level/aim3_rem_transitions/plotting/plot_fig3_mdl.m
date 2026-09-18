@@ -24,10 +24,10 @@ end
 
 
 if isfield(h, 'b')
-    h.a(2).Color = css_standard_colors('red');
-    h.a(3).Color = css_standard_colors('red');
-    h.b(2).Color = css_standard_colors('blue');
-    h.b(3).Color = css_standard_colors('blue');
+    h.a(2).Color = standard_colors('red');
+    h.a(3).Color = standard_colors('red');
+    h.b(2).Color = standard_colors('blue');
+    h.b(3).Color = standard_colors('blue');
 else
     h.a(2).Color = 'k';
     h.a(3).Color = 'k';

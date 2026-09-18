@@ -17,10 +17,10 @@ switch orient
             'GroupWidth', 1);
 end
 
-h(1).EdgeColor = css_standard_colors('pbo');
-h(1).FaceColor = css_standard_colors('pbo');
-h(2).EdgeColor = css_standard_colors('etc');
-h(2).FaceColor = css_standard_colors('etc');
+h(1).EdgeColor = standard_colors('pbo');
+h(1).FaceColor = standard_colors('pbo');
+h(2).EdgeColor = standard_colors('etc');
+h(2).FaceColor = standard_colors('etc');
 
 Ax.Color = [0.96 0.97 0.99];
 Ax.Box = 'on';

@@ -1,4 +1,4 @@
-function analyse_sigma_spindle_similarity()
+function css_analyse_sigma_spindle_similarity()
 % -------------------------------------------------------------------------
 % STEP 1:
 % Use 300-second bouts of continuous N2 sleep to describe the sigma/spindle
@@ -35,7 +35,7 @@ for f = 1:length(SigmaFiles)
     Features(2).type = 'density';
     Features(2).data = SpdDens;
     % Save output
-    css_createfstlvloutput(outfname, Features);
+    create_fstlvl_output(outfname, Features);
 end
 % -------------------------------------------------------------------------
 % Create supplementary figure showing mean sigma power and spindle density

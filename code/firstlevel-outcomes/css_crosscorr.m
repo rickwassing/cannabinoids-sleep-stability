@@ -104,7 +104,7 @@ Features(3).type = 's';
 Features(3).data = fwhm./HR.srate;
 
 % Save output
-css_createfstlvloutput(cfg.outfilepath, Features, X);
+create_fstlvl_output(cfg.outfilepath, Features, X);
 
 % Plotting (if requested)
 if cfg.doPlot

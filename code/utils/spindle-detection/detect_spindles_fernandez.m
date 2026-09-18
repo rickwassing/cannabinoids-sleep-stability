@@ -1,5 +1,5 @@
-function [m_Spindles,st_Spindles] = f_SpDetection_Humans(v_Signals, s_Fs, v_Hyp, varargin)
-% f_SpindleDetection
+function [m_Spindles,st_Spindles] = detect_spindles_fernandez(v_Signals, s_Fs, v_Hyp, varargin)
+% detect_spindles_fernandez
 % This function detects sleep spindles using the method of envelope and
 % the method of LF (Fernandez et al., 2018) with the peaks. With this
 % function either you include all the four parameters for or select a

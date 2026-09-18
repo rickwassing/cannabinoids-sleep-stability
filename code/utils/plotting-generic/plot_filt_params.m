@@ -1,4 +1,4 @@
-function [Fig, fname] = plotFiltParams(SIGMA, filtcfg, const)
+function [Fig, fname] = plot_filt_params(SIGMA, filtcfg, const)
 
 % Sampling rate
 fs = SIGMA(1).srate;

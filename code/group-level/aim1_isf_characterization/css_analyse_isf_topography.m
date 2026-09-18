@@ -1,4 +1,4 @@
-function analyse_isf_topography()
+function css_analyse_isf_topography()
 % -------------------------------------------------------------------------
 % Visually inspect the IFS spectra and interpolate bad channels
 Files = dir('derivatives/EEG-output-fstlvl/sub-*/ses-*/sub-*_desc-a1c*sigma_fstlvl.mat');

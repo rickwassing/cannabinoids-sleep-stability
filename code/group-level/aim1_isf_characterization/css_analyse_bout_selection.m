@@ -1,4 +1,4 @@
-function analyse_bout_selection()
+function css_analyse_bout_selection()
 % -------------------------------------------------------------------------
 % STEP 1:
 % Use 300-second bouts of continuous N2 sleep to describe the sigma/spindle

@@ -1,4 +1,4 @@
-function [m_Spindles, v_Duration, v_SpindleFreqs] = f_SpDetection_Wamsley(v_Signals, s_Fs, v_Hyp, varargin)
+function [m_Spindles, v_Duration, v_SpindleFreqs] = detect_spindles_wamsley(v_Signals, s_Fs, v_Hyp, varargin)
 
 m_Spindles = 0;
 v_Duration = 0;

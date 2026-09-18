@@ -1,4 +1,4 @@
-function analyse_filter_edge_artefact()
+function css_analyse_filter_edge_artefact()
 clc
 clear
 close all
@@ -269,14 +269,14 @@ text(Ax(ai), mean([max(sum(YData'))-filtcfg.order, max(sum(YData'))]), 1, 'filte
 plot(Ax(ai), [length(sig_test.prepend), 0], [0.75 0], ':k')
 plot(Ax(ai), [length(sig_test.prepend)+4*filtcfg.order, max(sum(YData'))*0.74], [0.75 0], ':k')
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-bh(1).FaceColor = css_standard_colors('white');
-bh(2).FaceColor = css_standard_colors('brick');
-bh(3).FaceColor = css_standard_colors('brick').^0.6;
-bh(4).FaceColor = css_standard_colors('white');
-bh(5).FaceColor = css_standard_colors('white');
-bh(6).FaceColor = css_standard_colors('cyan');
-bh(7).FaceColor = css_standard_colors('cyan').^0.6;
-bh(8).FaceColor = css_standard_colors('white');
+bh(1).FaceColor = standard_colors('white');
+bh(2).FaceColor = standard_colors('brick');
+bh(3).FaceColor = standard_colors('brick').^0.6;
+bh(4).FaceColor = standard_colors('white');
+bh(5).FaceColor = standard_colors('white');
+bh(6).FaceColor = standard_colors('cyan');
+bh(7).FaceColor = standard_colors('cyan').^0.6;
+bh(8).FaceColor = standard_colors('white');
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 % Axis props
 Ax(ai).Box = 'off';
@@ -302,10 +302,10 @@ Ax(ai) = axes('NextPlot', 'add', 'Layer', 'top');
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 idx_sel = 400;
 patch(Ax(ai), 'XData', repmat(size(SIGA, 2), 1, 4)+[-500 0 0 -500], 'YData', [-8 -8 12 12], 'LineStyle', 'none', 'FaceColor', [0.92 0.93 0.95])
-plot(1:size(SIGA, 2), SIGB(idx_sel, :).*4+5, '-', 'LineWidth', 1, 'Color', css_standard_colors('brick'))
-plot(1:size(SIGA, 2), SIGA(idx_sel, :).*4+5, '-', 'LineWidth', 1, 'Color', css_standard_colors('cyan'))
-plot(1:size(ANGB, 2), ANGB(idx_sel, :)-pi, '-', 'LineWidth', 1, 'Color', css_standard_colors('brick'))
-plot(1:size(ANGA, 2), ANGA(idx_sel, :)-pi, '-', 'LineWidth', 1, 'Color', css_standard_colors('cyan'))
+plot(1:size(SIGA, 2), SIGB(idx_sel, :).*4+5, '-', 'LineWidth', 1, 'Color', standard_colors('brick'))
+plot(1:size(SIGA, 2), SIGA(idx_sel, :).*4+5, '-', 'LineWidth', 1, 'Color', standard_colors('cyan'))
+plot(1:size(ANGB, 2), ANGB(idx_sel, :)-pi, '-', 'LineWidth', 1, 'Color', standard_colors('brick'))
+plot(1:size(ANGA, 2), ANGA(idx_sel, :)-pi, '-', 'LineWidth', 1, 'Color', standard_colors('cyan'))
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 % Axis props
 Ax(ai).Box = 'on';
@@ -322,10 +322,10 @@ Ax(ai).YTickLabel = {'angle', 'signal'};
 ai = ai+1;
 Ax(ai) = axes('NextPlot', 'add', 'Color', [0.92 0.93 0.95]);
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-plot(1:size(SIGA, 2), SIGB(idx_sel, :).*4+5, '-', 'LineWidth', 1, 'Color', css_standard_colors('brick'))
-plot(1:size(SIGA, 2), SIGA(idx_sel, :).*4+5, '-', 'LineWidth', 1, 'Color', css_standard_colors('cyan'))
-plot(1:size(ANGB, 2), ANGB(idx_sel, :)-pi, '-', 'LineWidth', 1, 'Color', css_standard_colors('brick'))
-plot(1:size(ANGA, 2), ANGA(idx_sel, :)-pi, '-', 'LineWidth', 1, 'Color', css_standard_colors('cyan'))
+plot(1:size(SIGA, 2), SIGB(idx_sel, :).*4+5, '-', 'LineWidth', 1, 'Color', standard_colors('brick'))
+plot(1:size(SIGA, 2), SIGA(idx_sel, :).*4+5, '-', 'LineWidth', 1, 'Color', standard_colors('cyan'))
+plot(1:size(ANGB, 2), ANGB(idx_sel, :)-pi, '-', 'LineWidth', 1, 'Color', standard_colors('brick'))
+plot(1:size(ANGA, 2), ANGA(idx_sel, :)-pi, '-', 'LineWidth', 1, 'Color', standard_colors('cyan'))
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 % Axis props
 Ax(ai).Box = 'on';

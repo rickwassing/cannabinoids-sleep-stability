@@ -1,4 +1,4 @@
-function [sig, cmpx] = predictISF(sig, const, doPlot)
+function [sig, cmpx] = predict_isf(sig, const, doPlot)
 
 if nargin < 3
     doPlot = false;

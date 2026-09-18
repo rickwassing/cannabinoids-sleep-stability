@@ -12,25 +12,25 @@ clear YData EData
 
 cond = 'pbo';
 fld = 'aw';
-[~, YData.(cond).(fld)] = withinSubMean(T(pcfg.idx.(cond).(fld), :), 'amp_d0', 1);
+[~, YData.(cond).(fld)] = within_sub_mean(T(pcfg.idx.(cond).(fld), :), 'amp_d0', 1);
 YData.(cond).(fld) = YData.(cond).(fld)';
 EData.(cond).(fld) = tinv(0.975, size(YData.(cond).(fld), 2)-1).*(std(YData.(cond).(fld), [], 2)./sqrt(size(YData.(cond).(fld), 2)));
 
 cond = 'pbo';
 fld = 'cs';
-[~, YData.(cond).(fld)] = withinSubMean(T(pcfg.idx.(cond).(fld), :), 'amp_d0', 1);
+[~, YData.(cond).(fld)] = within_sub_mean(T(pcfg.idx.(cond).(fld), :), 'amp_d0', 1);
 YData.(cond).(fld) = YData.(cond).(fld)';
 EData.(cond).(fld) = tinv(0.975, size(YData.(cond).(fld), 2)-1).*(std(YData.(cond).(fld), [], 2)./sqrt(size(YData.(cond).(fld), 2)));
 
 cond = 'etc';
 fld = 'aw';
-[~, YData.(cond).(fld)] = withinSubMean(T(pcfg.idx.(cond).(fld), :), 'amp_d0', 1);
+[~, YData.(cond).(fld)] = within_sub_mean(T(pcfg.idx.(cond).(fld), :), 'amp_d0', 1);
 YData.(cond).(fld) = YData.(cond).(fld)';
 EData.(cond).(fld) = tinv(0.975, size(YData.(cond).(fld), 2)-1).*(std(YData.(cond).(fld), [], 2)./sqrt(size(YData.(cond).(fld), 2)));
 
 cond = 'etc';
 fld = 'cs';
-[~, YData.(cond).(fld)] = withinSubMean(T(pcfg.idx.(cond).(fld), :), 'amp_d0', 1);
+[~, YData.(cond).(fld)] = within_sub_mean(T(pcfg.idx.(cond).(fld), :), 'amp_d0', 1);
 YData.(cond).(fld) = YData.(cond).(fld)';
 EData.(cond).(fld) = tinv(0.975, size(YData.(cond).(fld), 2)-1).*(std(YData.(cond).(fld), [], 2)./sqrt(size(YData.(cond).(fld), 2)));
 
@@ -40,8 +40,8 @@ h = errorbar(Ax, [1, 3], ...
     'LineStyle', 'none', ...
     'Color', 'k', ...
     'MarkerSize', 3, ...
-    'MarkerFaceColor', css_standard_colors('pbo'), ...
-    'MarkerEdgeColor', css_standard_colors('pbo'));
+    'MarkerFaceColor', standard_colors('pbo'), ...
+    'MarkerEdgeColor', standard_colors('pbo'));
 
 h = errorbar(Ax, [2, 4], ...
     [mean(YData.etc.aw), mean(YData.etc.cs)], ...
@@ -49,8 +49,8 @@ h = errorbar(Ax, [2, 4], ...
     'LineStyle', 'none', ...
     'Color', 'k', ...
     'MarkerSize', 3, ...
-    'MarkerFaceColor', css_standard_colors('etc'), ...
-    'MarkerEdgeColor', css_standard_colors('etc'));
+    'MarkerFaceColor', standard_colors('etc'), ...
+    'MarkerEdgeColor', standard_colors('etc'));
 
 Ax.XLim = [0.33, 4.67];
 Ax.XTick = [1.5, 3.5];

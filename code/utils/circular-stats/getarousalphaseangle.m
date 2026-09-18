@@ -59,7 +59,7 @@ for i = 1:length(SIG)
         cntbouts.processed = cntbouts.processed+1;
         % Calculate Hilbert on filtered signal (and predict last 5 seconds)
         fsig = isffilterbout(sig, filtcfg);
-        [fsig, cmplx] = predictISF(fsig, const);
+        [fsig, cmplx] = predict_isf(fsig, const);
         % Pivot the matrix
         instamp = abs(cmplx)'; % instantaneous amplitude
         phaseang = angle(cmplx)'; % instantaneous phase

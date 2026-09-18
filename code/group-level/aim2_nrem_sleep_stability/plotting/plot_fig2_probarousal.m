@@ -15,12 +15,12 @@ Ax.Color = [0.96 0.97 0.99];
 switch fld
     case 'aw'
         Ax.Title.String = 'AWAKENINGS';
-        Ax.Title.Color = css_standard_colors('aw');
+        Ax.Title.Color = standard_colors('aw');
         Ax.YLabel.String = 'Pr(aro)';
         Ax.YLabel.FontSize = 8;
     case 'cs'
         Ax.Title.String = 'CONT. SLEEP';
-        Ax.Title.Color = css_standard_colors('cs');
+        Ax.Title.Color = standard_colors('cs');
         Ax.YLabel.String = ' ';
         Ax.YLabel.FontSize = 8;
         Ax.YTickLabel{2} = '';
@@ -37,36 +37,36 @@ plot(Ax, [0, 0], Ax.YLim, ':k')
 % Plot significant bins
 YData = double(perms(1).pr.(fld).pval < 0.05);
 YData(~YData) = nan;
-plot(Ax, XData, YData*(Ax.YLim(2).*0.9), '-', 'LineWidth', 3, 'Color', css_standard_colors('bluegrey'))
+plot(Ax, XData, YData*(Ax.YLim(2).*0.9), '-', 'LineWidth', 3, 'Color', standard_colors('bluegrey'))
 
 % Plot significant bins
 if strcmpi(fld, 'aw')
     YData = double(perms(1).pr.pbo.pval < 0.05);
     YData(~YData) = nan;
-    plot(Ax, XData, YData*(Ax.YLim(2).*0.9), '-k', 'LineWidth', 3, 'Color', css_standard_colors('pbo'))
+    plot(Ax, XData, YData*(Ax.YLim(2).*0.9), '-k', 'LineWidth', 3, 'Color', standard_colors('pbo'))
 end
 if strcmpi(fld, 'cs')
     YData = double(perms(1).pr.etc.pval < 0.05);
     YData(~YData) = nan;
-    plot(Ax, XData, YData*(Ax.YLim(2).*0.9), '-k', 'LineWidth', 3, 'Color', css_standard_colors('etc'))
+    plot(Ax, XData, YData*(Ax.YLim(2).*0.9), '-k', 'LineWidth', 3, 'Color', standard_colors('etc'))
 end
 
 % Plot Pr(Aro) for placebo
-[PrAroData] = mean(withinSubMean(T(pcfg.idx.pbo.(fld), :), 'pr_aro'));
+[PrAroData] = mean(within_sub_mean(T(pcfg.idx.pbo.(fld), :), 'pr_aro'));
 patch(Ax, ...
     'XData', [XData(1), XData, XData(end)], ...
     'YData', [0, PrAroData, 0], ...
     'LineStyle', 'none', ...
-    'FaceColor', css_standard_colors('pbo'), ...
+    'FaceColor', standard_colors('pbo'), ...
     'FaceAlpha', 0.3)
 
 % Plot Pr(Aro) for THC/CBD
-[PrAroData] = mean(withinSubMean(T(pcfg.idx.etc.(fld), :), 'pr_aro'));
+[PrAroData] = mean(within_sub_mean(T(pcfg.idx.etc.(fld), :), 'pr_aro'));
 patch(Ax, ...
     'XData', [XData(1), XData, XData(end)], ...
     'YData', [0, PrAroData, 0], ...
     'LineStyle', 'none', ...
-    'FaceColor', css_standard_colors('etc'), ...
+    'FaceColor', standard_colors('etc'), ...
     'FaceAlpha', 0.3)
 
 end

@@ -1,4 +1,4 @@
-function MU = withinChanCircMean(T, fld)
+function MU = within_chan_circ_mean(T, fld)
 
 if iscell(T.(fld))
     Data = cat(1, T.(fld){:});

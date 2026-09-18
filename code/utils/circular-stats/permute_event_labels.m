@@ -1,5 +1,5 @@
-function T = permuteEventLabels(T, labelVarName)
-%PERMUTEEVENTLABELS Permute 'cond' or 'is_awakening' respecting subject structure
+function T = permute_event_labels(T, labelVarName)
+%PERMUTE_EVENT_LABELS Permute 'cond' or 'is_awakening' respecting subject structure
 %
 % INPUTS:
 %   T            - event-level table (one row per arousal)

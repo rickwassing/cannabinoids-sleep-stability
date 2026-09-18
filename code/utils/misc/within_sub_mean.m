@@ -1,4 +1,4 @@
-function [MU, EV] = withinSubMean(T, fld, smoothfactor)
+function [MU, EV] = within_sub_mean(T, fld, smoothfactor)
 
 if nargin < 3
     smoothfactor = 1;

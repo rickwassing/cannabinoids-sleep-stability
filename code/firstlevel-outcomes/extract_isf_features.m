@@ -1,4 +1,4 @@
-function features = css_extractfeatures(FIT, ISF)
+function features = extract_isf_features(FIT, ISF)
 
 features = struct();
 i = 0;

@@ -1,4 +1,4 @@
-% AVERAGESIGMAPEREVENT Average sigma power across all 18 channels for each arousal event
+% AVERAGE_SIGMA_PER_EVENT Average sigma power across all 18 channels for each arousal event
 %
 % INPUT:
 %   T - table with columns: sub, cond, id, chan, Sigma, outcome (and optionally others)
@@ -6,7 +6,7 @@
 % OUTPUT:
 %   T_event - table with one row per event, with averaged Sigma across channels
 
-function desmat_event = averageSigmaPerEvent(desmat)
+function desmat_event = average_sigma_per_event(desmat)
 
 % Ensure categorical variables
 desmat.cond = categorical(desmat.cond);

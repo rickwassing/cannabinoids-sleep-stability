@@ -245,8 +245,8 @@ ISF.data = cat(2, FIT.pow)';
 ISF.freqs = FIT(1).freq;
 ISF.freqstep = mean(diff(FIT(1).freq));
 % Extract the features used in group level analysis
-ISF.features = css_extractfeatures(FIT, ISF);
+ISF.features = extract_isf_features(FIT, ISF);
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-css_createfstlvloutput(strrep(cfg.outfilepath, '.set', '.mat'), ISF.features, ISF);
+create_fstlvl_output(strrep(cfg.outfilepath, '.set', '.mat'), ISF.features, ISF);
 
 end

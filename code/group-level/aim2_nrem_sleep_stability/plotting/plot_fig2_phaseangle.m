@@ -23,13 +23,13 @@ switch fld
         Ax.YLabel.String = ' # arousals';
         Ax.YLabel.FontSize = 10;
         Ax.Title.String = 'AWAKENINGS';
-        Ax.Title.Color = css_standard_colors('aw');
+        Ax.Title.Color = standard_colors('aw');
     case 'cs'
         Ax.YLabel.String = ' ';
         Ax.YLabel.FontSize = 10;
         Ax.YTick = [];
         Ax.Title.String = 'CONT. SLEEP';
-        Ax.Title.Color = css_standard_colors('cs');
+        Ax.Title.Color = standard_colors('cs');
 end
 Ax.Title.FontWeight = 'normal';
 Ax.Title.FontSize = 10;
@@ -57,7 +57,7 @@ plot(Ax, XData+pi/4, YData, '-', 'Color', [0.839, 0.847, 0.863])
 
 % - Placebo
 if doAvg
-    AData_pbo = withinChanCircMean(T(pcfg.idx.pbo.(fld), :), delay);
+    AData_pbo = within_chan_circ_mean(T(pcfg.idx.pbo.(fld), :), delay);
 else
     AData_pbo = T.(delay)(pcfg.idx.pbo.(fld), :);
 end
@@ -66,7 +66,7 @@ Pr_pbo = histcounts(AData_pbo, 'BinEdges', pcfg.bins.edges);
 
 % - THC/CBD
 if doAvg
-    AData_etc = withinChanCircMean(T(pcfg.idx.etc.(fld), :), delay);
+    AData_etc = within_chan_circ_mean(T(pcfg.idx.etc.(fld), :), delay);
 else
     AData_etc = T.(delay)(pcfg.idx.etc.(fld), :);
 end
@@ -89,7 +89,7 @@ h = bar(XData, YData, ...
     'GroupWidth', 1, ...
     'LineStyle', 'none');
 
-h(1).FaceColor = css_standard_colors('pbo');
-h(2).FaceColor = css_standard_colors('etc');
+h(1).FaceColor = standard_colors('pbo');
+h(2).FaceColor = standard_colors('etc');
 
 end

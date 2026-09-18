@@ -1,4 +1,4 @@
-function analyse_sleep_macroarchitecture_and_arousal_outcomes()
+function css_analyse_sleep_macroarchitecture()
 % Load data
 PSG = readtable('phenotype/2024-07-26T171508_psg-variables.csv');
 ARO = readtable('phenotype/2024-07-26T171508_arousals.csv');
@@ -172,8 +172,8 @@ EData = tinv(0.975, length(idxPBO)-1) .* [ ...
     std(PSG.i_aro_n3(idxPBO))/sqrt(sum(idxPBO)), std(PSG.i_aro_n3(~idxPBO))/sqrt(sum(~idxPBO))];
 
 b = bar(Ax(ai), 1:size(YData,1), YData);
-b(1).FaceColor = css_standard_colors('pbo');
-b(2).FaceColor = css_standard_colors('etc');
+b(1).FaceColor = standard_colors('pbo');
+b(2).FaceColor = standard_colors('etc');
 
 errorbar(b(1).XEndPoints, YData(:,1), EData(:,1), 'k','LineStyle','none','CapSize',2);
 errorbar(b(2).XEndPoints, YData(:,2), EData(:,2), 'k','LineStyle','none','CapSize',2);
@@ -213,8 +213,8 @@ YData = [ ...
     histcounts(ARO.duration(idx & ARO.cond=="etc120"), BinEdges)'];
 
 b = bar(Ax(ai), BinCenters, YData, 1, 'GroupWidth',0.9);
-b(1).FaceColor = css_standard_colors('pbo');
-b(2).FaceColor = css_standard_colors('etc');
+b(1).FaceColor = standard_colors('pbo');
+b(2).FaceColor = standard_colors('etc');
 
 Ax(ai).FontSize = 8;
 Ax(ai).TickLength = [0 0];
@@ -262,25 +262,25 @@ for s = 1:length(stages)
 
     plot([3.5, 3.5], [0, 1.05], '-k')
 
-    errorbar(1.1, S(s).pred(1), S(s).pred(1) - S(s).ci(1, 1), 'o', 'MarkerSize', 3, 'Color', css_standard_colors('black'), 'MarkerEdgeColor', css_standard_colors('black'), 'MarkerFaceColor', css_standard_colors('pbo'), 'CapSize', 1.5)
-    errorbar(2.4, S(s).pred(2), S(s).pred(2) - S(s).ci(2, 1), 'o', 'MarkerSize', 3, 'Color', css_standard_colors('black'), 'MarkerEdgeColor', css_standard_colors('black'), 'MarkerFaceColor', css_standard_colors('etc'), 'CapSize', 1.5)
+    errorbar(1.1, S(s).pred(1), S(s).pred(1) - S(s).ci(1, 1), 'o', 'MarkerSize', 3, 'Color', standard_colors('black'), 'MarkerEdgeColor', standard_colors('black'), 'MarkerFaceColor', standard_colors('pbo'), 'CapSize', 1.5)
+    errorbar(2.4, S(s).pred(2), S(s).pred(2) - S(s).ci(2, 1), 'o', 'MarkerSize', 3, 'Color', standard_colors('black'), 'MarkerEdgeColor', standard_colors('black'), 'MarkerFaceColor', standard_colors('etc'), 'CapSize', 1.5)
 
     errorpatch(Ax(ai), G.mean_duration(G.cond=="placebo"), G.mean_is_awakening(G.cond=="placebo"), G.conf_is_awakening(G.cond=="placebo"), ...
         'FaceAlpha', 0.33, ...
-        'FaceColor', css_standard_colors('pbo'));
+        'FaceColor', standard_colors('pbo'));
 
     errorpatch(Ax(ai), G.mean_duration(G.cond=="etc120"), G.mean_is_awakening(G.cond=="etc120"), G.conf_is_awakening(G.cond=="etc120"), ...
         'FaceAlpha', 0.33, ...
-        'FaceColor', css_standard_colors('etc'));
+        'FaceColor', standard_colors('etc'));
 
     % Plot
     plot(G.mean_duration(G.cond=="placebo"), ...
         G.mean_is_awakening(G.cond=="placebo"), ...
-        '-', 'Color', css_standard_colors('pbo'), 'LineWidth', 1.5);
+        '-', 'Color', standard_colors('pbo'), 'LineWidth', 1.5);
 
     plot(G.mean_duration(G.cond=="etc120"), ...
         G.mean_is_awakening(G.cond=="etc120"), ...
-        '-', 'Color', css_standard_colors('etc'), 'LineWidth', 1.5);
+        '-', 'Color', standard_colors('etc'), 'LineWidth', 1.5);
 
     Ax(ai).TickLength = [0 0];
     Ax(ai).FontSize = 8;

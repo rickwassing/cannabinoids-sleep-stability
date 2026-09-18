@@ -1,4 +1,4 @@
-function [m_Spindles, v_Duration, v_SpindleFreqs] = f_SpDetection_Ferrarelli(v_Signals, s_Fs, v_Hyp, varargin)
+function [m_Spindles, v_Duration, v_SpindleFreqs] = detect_spindles_ferrarelli(v_Signals, s_Fs, v_Hyp, varargin)
 try
     if nargin < 4
         v_Aro = false(size(v_Signals));

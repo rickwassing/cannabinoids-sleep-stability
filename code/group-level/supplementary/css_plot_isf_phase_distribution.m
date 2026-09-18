@@ -1,4 +1,4 @@
-function plot_isf_phase_distribution_illustration()
+function css_plot_isf_phase_distribution()
 
 load('analysis_2a.mat', 'ANGA');
 
@@ -108,7 +108,7 @@ h = bar(XData, YData, ...
     'GroupWidth', 1, ...
     'LineStyle', 'none');
 
-h(1).FaceColor = css_standard_colors('bluegrey');
+h(1).FaceColor = standard_colors('bluegrey');
 
 Ax(1).Position([1 3]) = Ax(2).Position([1 3]);
 

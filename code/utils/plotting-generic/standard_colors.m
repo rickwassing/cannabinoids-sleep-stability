@@ -1,4 +1,4 @@
-function clr = css_standard_colors(varargin)
+function clr = standard_colors(varargin)
 
 if nargin < 1
     input = [];

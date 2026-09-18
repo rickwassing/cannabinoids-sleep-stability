@@ -53,7 +53,7 @@ for p = 1:nperms
 
     % For p>1 perform label permutation(s)
     if p > 1
-        desmat = permuteEventLabels(desmat, 'cond');
+        desmat = permute_event_labels(desmat, 'cond');
     end
 
     for tme = 1:num_timepoints

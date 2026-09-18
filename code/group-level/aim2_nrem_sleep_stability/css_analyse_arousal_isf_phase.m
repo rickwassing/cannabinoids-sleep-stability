@@ -1,4 +1,4 @@
-function analyse_arousal_isf_phase()
+function css_analyse_arousal_isf_phase()
 % -------------------------------------------------------------------------
 % Use the the 130-second pre-arousal bouts of continuous N2 sleep to
 % determine the phase angle, amplitude (hilbert) between state-shift
@@ -58,7 +58,7 @@ filtcfg.warg = 6;
 filtcfg.order = pop_firwsord(filtcfg.wintype, SIGMA_P(1).srate, filtcfg.transbw, filtcfg.rippledev);
 
 close all
-[Fig, fname] = plotFiltParams(SIGMA_P, filtcfg, const);
+[Fig, fname] = plot_filt_params(SIGMA_P, filtcfg, const);
 exportgraphics(Fig, fname, 'Resolution', 300)
 
 %% -------------------------------------------------------------------------
@@ -184,7 +184,7 @@ for ri = 1:length(rois)
             Clust_this = Clust_pz;
     end
 
-    T_this.(delay) = correctPhaseByEmpiricalCDF(T_this.(delay));
+    T_this.(delay) = correct_phase_by_empirical_cdf(T_this.(delay));
 
 
     pcfg.idx.pbo.aw = ismember(T_this.aro_type, {'arousal', 'arousalemg'}) & ismember(T_this.ses, {'placebo'}) & T_this.is_awakening == 'true';
@@ -221,7 +221,7 @@ for ri = 1:length(rois)
         for cond = {'pbo', 'etc'}
             r = r+1;
             delay = 'phase_d0';
-            AData = withinChanCircMean(T_this(pcfg.idx.(cond{:}).(fld{:}), :), delay);
+            AData = within_chan_circ_mean(T_this(pcfg.idx.(cond{:}).(fld{:}), :), delay);
             
             [pval, m] = circ_rtest(AData);
             fprintf('Rayleigh test for non-uniformity of ''%s'' arousals in ''%s'' condition (m = %.2f, p = %.3f).\n', fld{:}, cond{:}, m, pval)
@@ -252,13 +252,13 @@ for ri = 1:length(rois)
 
     for fld = {'aw', 'cs'}
         [pval, k] = circ_kuipertest(...
-            withinChanCircMean(T_this(pcfg.idx.pbo.(fld{:}), :), delay), ...
-            withinChanCircMean(T_this(pcfg.idx.etc.(fld{:}), :), delay), ...
+            within_chan_circ_mean(T_this(pcfg.idx.pbo.(fld{:}), :), delay), ...
+            within_chan_circ_mean(T_this(pcfg.idx.etc.(fld{:}), :), delay), ...
             pcfg.nbins, false);
         fprintf('Kuiper-test indicated phase angles are different between PBO and ETC for ''%s'' arousals (k = %.2f, p = %.3f).\n', fld{:}, k, pval)
 
-        A1 = withinChanCircMean(T_this(pcfg.idx.pbo.(fld{:}), :), delay);
-        A2 = withinChanCircMean(T_this(pcfg.idx.etc.(fld{:}), :), delay);
+        A1 = within_chan_circ_mean(T_this(pcfg.idx.pbo.(fld{:}), :), delay);
+        A2 = within_chan_circ_mean(T_this(pcfg.idx.etc.(fld{:}), :), delay);
         [pval, U2_obs, U2_H0] = watsons_U2_perm_test(A1,A2, 200);
         fprintf('Nonparametric permutation test based on Watson''s U2 indicated phase angles are/are not different between PBO and ETC for ''%s'' arousals (U2 = %.2f, p = %.3f).\n', fld{:}, U2_obs, pval)
 

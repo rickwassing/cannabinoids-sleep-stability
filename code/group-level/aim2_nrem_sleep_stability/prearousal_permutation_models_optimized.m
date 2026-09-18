@@ -21,7 +21,7 @@ for t = 1:num_timepoints
     desmat.(sprintf('Pr%i', t)) = cellfun(@(d) double(d(t)), T.pr_aro);
 end
 
-desmat = averageSigmaPerEvent(desmat);
+desmat = average_sigma_per_event(desmat);
 desmat_orig = desmat;
 
 % ------------------------------------------------------------------------
@@ -67,8 +67,8 @@ for p = 1:nperms
 
     % For p>1 perform label permutation(s)
     if p > 1
-        desmat = permuteEventLabels(desmat, 'cond');
-        desmat = permuteEventLabels(desmat, 'is_awakening');
+        desmat = permute_event_labels(desmat, 'cond');
+        desmat = permute_event_labels(desmat, 'is_awakening');
     end
 
     desmat_aw_true = desmat(desmat.is_awakening == "true", :);

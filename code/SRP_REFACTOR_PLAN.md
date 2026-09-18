@@ -136,45 +136,64 @@ identical logic under two names. Every active caller in `code/` used `css_eeglab
 
 ---
 
-## Phase 3 — Naming convention pass (not yet started)
+## Phase 3 — Naming convention pass
 
-Rename all non-`lower_snake_case` function names, updating every call site. Per your explicit
-decision, this includes the vendor/third-party-derived spindle-detection functions (no exception
-for provenance — they're fully ours to maintain now).
+Renamed all non-`lower_snake_case` function names, updating every call site. Per your explicit
+decision, this included the vendor/third-party-derived spindle-detection functions (no exception
+for provenance — they're fully ours to maintain now). A re-run of the Phase-1 name-classifier
+script during execution turned up one additional non-compliant name not caught during planning
+(`averageSigmaPerEvent`) — added to the batch below.
 
-**Planned renames:**
+**Renames executed:**
 
-| Current name | New name | File |
+| Old name | New name | File |
 |---|---|---|
-| `withinChanCircMean` | `within_chan_circ_mean` | `utils/circular-stats/withinChanCircMean.m` |
-| `correctPhaseByEmpiricalCDF` | `correct_phase_by_empirical_cdf` | `utils/circular-stats/correctPhaseByEmpiricalCDF.m` |
-| `permuteEventLabels` | `permute_event_labels` | `utils/circular-stats/permuteEventLabels.m` |
-| `predictISF` | `predict_isf` | `utils/isf-fitting/predictISF.m` |
-| `withinConditionNorm` | `within_condition_norm` | `utils/misc/withinConditionNorm.m` |
-| `withinSubMean` | `within_sub_mean` | `utils/misc/withinSubMean.m` |
-| `plotFiltParams` | `plot_filt_params` | `utils/plotting-generic/plotFiltParams.m` |
-| `f_SpDetection_Ferrarelli` | `detect_spindles_ferrarelli` | `utils/spindle-detection/f_SpDetection_Ferrarelli.m` |
-| `f_SpDetection_Humans` | `detect_spindles_fernandez` (implements Fernandez et al. 2018 per its own header comment, despite the filename) | `utils/spindle-detection/f_SpDetection_Humans.m` |
-| `f_SpDetection_Wamsley` | `detect_spindles_wamsley` | `utils/spindle-detection/f_SpDetection_Wamsley.m` |
+| `averageSigmaPerEvent` | `average_sigma_per_event` | `utils/circular-stats/averageSigmaPerEvent.m` → `average_sigma_per_event.m` |
+| `withinChanCircMean` | `within_chan_circ_mean` | `utils/circular-stats/withinChanCircMean.m` → `within_chan_circ_mean.m` |
+| `correctPhaseByEmpiricalCDF` | `correct_phase_by_empirical_cdf` | `utils/circular-stats/correctPhaseByEmpiricalCDF.m` → `correct_phase_by_empirical_cdf.m` |
+| `permuteEventLabels` | `permute_event_labels` | `utils/circular-stats/permuteEventLabels.m` → `permute_event_labels.m` |
+| `predictISF` | `predict_isf` | `utils/isf-fitting/predictISF.m` → `predict_isf.m` |
+| `withinConditionNorm` | `within_condition_norm` | `utils/misc/withinConditionNorm.m` → `within_condition_norm.m` |
+| `withinSubMean` | `within_sub_mean` | `utils/misc/withinSubMean.m` → `within_sub_mean.m` |
+| `plotFiltParams` | `plot_filt_params` | `utils/plotting-generic/plotFiltParams.m` → `plot_filt_params.m` |
+| `f_SpDetection_Ferrarelli` | `detect_spindles_ferrarelli` | `utils/spindle-detection/f_SpDetection_Ferrarelli.m` → `detect_spindles_ferrarelli.m` |
+| `f_SpDetection_Humans` | `detect_spindles_fernandez` (implements Fernandez et al. 2018 per its own header comment, despite the filename) | `utils/spindle-detection/f_SpDetection_Humans.m` → `detect_spindles_fernandez.m` |
+| `f_SpDetection_Wamsley` | `detect_spindles_wamsley` | `utils/spindle-detection/f_SpDetection_Wamsley.m` → `detect_spindles_wamsley.m` |
 
 (`csapsGCV`, `f_IFO_Parameters_140324`, `f_IFO_WithSpindles`, `f_MGT`, `withinChanCircMedian` were
 already archived in Phase 1 as dead code — not renamed in place, since they're not live.)
 
-**Planned actions:**
-- [ ] Rename each file (`git mv`) and its internal `function` line to match.
-- [ ] Update every call site across `code/` (grep-verified before and after).
-- [ ] Re-run the call-graph script to confirm no dangling references.
+**Actions:**
+- [x] Renamed each file (`git mv`, history preserved) and its internal `function` line
+      (including self-referential doc-comment headers, e.g. `%PERMUTEEVENTLABELS` →
+      `%PERMUTE_EVENT_LABELS`) to match.
+- [x] Updated every call site across `code/` (16 call sites across 8 files, grep-verified before
+      and after — used `sed` only for exact, unambiguous, repeated-pattern replacements within a
+      single file after visually confirming every occurrence matched, `editor` for all others).
+- [x] Re-ran the call-graph/reachability script: 91 non-archive files, 84 reached, same 7
+      intentionally-kept files unreached — no regressions.
+- [x] Re-ran the naming-convention classifier: **0 non-compliant function names remain** in
+      `code/` (excl. `toolboxes/`) — down from 11 flagged at the start of this phase (16 minus 5
+      that were already archived dead code from Phase 1, as noted above).
+- [x] Full repo-wide `grep` sweep for all 11 old names: zero references remain outside
+      `code/archive/`.
+
+**Phase 3 completed 2026-09-18.**
+
+**Skills/tools:** `editor` (function/file renames, call-site updates), `run_commands` (`git mv`,
+targeted `sed` for verified-safe bulk replacements, `grep` sweeps, Python call-graph re-run). No
+MCP server needed.
 
 ---
 
-## Phase 4 — `css_` prefix correction (not yet started)
+## Phase 4 — `css_` prefix correction
 
 **Rule:** `css_` prefix = "this is a first-to-call entry point that executes processing/analysis
 for the paper" (subject-level dispatch targets called from `run_processing_section.m`'s
 switch-case, or group-level functions called directly from `main.m`'s `% ANALYSE:` section).
 Everything called *within* those entry points keeps an unprefixed, descriptive name.
 
-**Add `css_` prefix to** (currently unprefixed, but called directly from `main.m`):
+**Added `css_` prefix to** (previously unprefixed, called directly from `main.m`):
 `analyse_bout_selection` → `css_analyse_bout_selection`,
 `analyse_sigma_spindle_similarity` → `css_analyse_sigma_spindle_similarity`,
 `analyse_isf_topography` → `css_analyse_isf_topography`,
@@ -182,30 +201,54 @@ Everything called *within* those entry points keeps an unprefixed, descriptive n
 `analyse_arousal_isf_phase` → `css_analyse_arousal_isf_phase`,
 `analyse_rem_transition_dynamics` → `css_analyse_rem_transition_dynamics`,
 `analyse_sleep_macroarchitecture_and_arousal_outcomes` → `css_analyse_sleep_macroarchitecture`
-(also shortened, see Phase 3 naming-length rule — final name to be confirmed),
-`plot_isf_phase_distribution_illustration` → `css_plot_isf_phase_distribution` (shortened, final
-name to be confirmed).
+(shortened per the naming-length rule),
+`plot_isf_phase_distribution_illustration` → `css_plot_isf_phase_distribution` (shortened).
 
-**Remove `css_` prefix from** (currently prefixed, but only called as internal helpers, never as
-a `main.m`/dispatch entry point):
+**Removed `css_` prefix from** (previously prefixed, but only called as internal helpers, never
+as a `main.m`/dispatch entry point):
 `css_extractfeatures` → `extract_isf_features` (called only by `css_infraslowfluctpowerspect`),
-`css_createfstlvloutput` → `create_fstlvl_output` (helper called by 4 files),
-`css_eeglab2hypnogram` → `eeglab2hypnogram` (after Phase 2 clears the duplicate — this becomes a
-pure utility called by many files, not a dispatch target itself),
+`css_createfstlvloutput` → `create_fstlvl_output` (helper called by 3 files),
 `css_standard_colors` → `standard_colors` (plotting utility, not an entry point).
 
-**Borderline cases proposed to leave as-is (confirm before Phase 4 executes):**
-`css_init` (top-level init, called directly by `main.m` — arguably a legitimate entry point) and
-`run_processing_section` (generic dispatcher, not itself an analysis step, but not `css_`-style
-named either — no change proposed here since it's a MATLAB filename constraint already, renamed
-once already in the original refactor).
+**Exception discovered during execution — `css_eeglab2hypnogram` keeps its prefix:**
+The plan proposed renaming `css_eeglab2hypnogram` → `eeglab2hypnogram` since it's a pure utility,
+not a dispatch target. This was attempted, but reverted: `main.m` runs `addpath(genpath('code'))`,
+which puts `code/archive/` on the MATLAB path alongside everything else. The exact-duplicate
+`eeglab2hypnogram.m` archived in Phase 2 (`code/archive/scratch/eeglab2hypnogram.m`) would then
+collide on the path with a *newly un-prefixed* `utils/eeg-io/eeglab2hypnogram.m`, recreating the
+ambiguous-shadowing problem Phase 2 specifically fixed. **Decision: `css_eeglab2hypnogram` is kept
+as a documented exception to the Phase 4 rule**, purely to avoid this name collision with archived
+code — not because it's actually an entry point.
 
-**Planned actions:**
-- [ ] Confirm final short names for the two "shortened" entries above before renaming.
-- [ ] Rename each file + function declaration, update every call site (`main.m`,
-      `run_processing_section.m`'s switch-case where relevant, and any internal callers).
-- [ ] Re-run the call-graph script to confirm no dangling references.
-- [ ] Update `code/README.md`'s traceability tables to match new names.
+**Borderline cases left as-is (per plan):**
+`css_init` (top-level init, called directly by `main.m` — a legitimate entry point) and
+`run_processing_section` (generic dispatcher, not itself an analysis step, but not `css_`-style
+named either — no change made, consistent with the original refactor's naming for this file).
+
+**Actions:**
+- [x] Renamed each file (`git mv`, history preserved) + function declaration for all 8
+      "add-prefix" and 3 "remove-prefix" functions (the 4th "remove-prefix" candidate,
+      `css_eeglab2hypnogram`, was reverted per the exception above — net-zero change, confirmed
+      via `git status` showing no diff for that file).
+- [x] Updated every call site: `main.m`'s 8 `% ANALYSE:` calls, plus internal callers of
+      `css_extractfeatures`/`css_createfstlvloutput`/`css_standard_colors` (2, 3, and 15 call
+      sites respectively — the 15 `css_standard_colors(` → `standard_colors(` call sites were
+      replaced via `sed` after visually confirming the pattern was unambiguous and exact across
+      all matched files).
+- [x] Full repo-wide `grep` sweep for all 11 old names (8 add-prefix + 3 successfully
+      remove-prefix): zero references remain outside `code/archive/`.
+- [x] Re-ran the call-graph/reachability script: 91 non-archive files, 84 reached, same 7
+      intentionally-kept files unreached — no regressions.
+- [x] Verified every remaining `css_*` file in `code/` (excl. `archive/`, `toolboxes/`) is either
+      a subject-level dispatch target, a `main.m` `% ANALYSE:` entry point, `css_init`, or the
+      documented `css_eeglab2hypnogram` exception — no stray/unjustified `css_` prefixes remain.
+
+**Phase 4 completed 2026-09-18.** `code/README.md`'s traceability tables still need updating to
+reflect the renamed functions — tracked as a Phase 6 action (final verification), not repeated
+here to avoid duplicate/conflicting edits across phases.
+
+**Skills/tools:** `editor` (function/file renames, call-site updates), `run_commands` (`git mv`,
+targeted `sed`, `grep` sweeps, Python call-graph re-run). No MCP server needed.
 
 ---
 
@@ -258,8 +301,8 @@ threshold, or numeric logic changes — pure decomposition.
 - [x] Phase 0 — Setup (2026-09-18)
 - [x] Phase 1 — Call-graph audit, dead-code archival, bug fixes (2026-09-18)
 - [x] Phase 2 — Fix `eeglab2hypnogram` duplicate (2026-09-18)
-- [ ] Phase 3 — Naming convention pass
-- [ ] Phase 4 — `css_` prefix correction
+- [x] Phase 3 — Naming convention pass (2026-09-18)
+- [x] Phase 4 — `css_` prefix correction (2026-09-18)
 - [ ] Phase 5 — SRP decomposition of large files
 - [ ] Phase 6 — Final verification
 

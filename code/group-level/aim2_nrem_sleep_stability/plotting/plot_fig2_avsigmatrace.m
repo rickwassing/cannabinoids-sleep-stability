@@ -47,34 +47,34 @@ end
 if strcmpi(fld, 'aw')
     YData = double(perms(1).y.pbo.pval < 0.05);
     YData(~YData) = nan;
-    plot(Ax, XData, YData*(Ax.YLim(1).*0.33), '-', 'LineWidth', 3, 'Color', css_standard_colors('pbo'))
+    plot(Ax, XData, YData*(Ax.YLim(1).*0.33), '-', 'LineWidth', 3, 'Color', standard_colors('pbo'))
 
     YData = double(perms(1).y.etc.pval < 0.05);
     YData(~YData) = nan;
-    plot(Ax, XData, YData*(Ax.YLim(1).*0.67), '-', 'LineWidth', 3, 'Color', css_standard_colors('etc'))
+    plot(Ax, XData, YData*(Ax.YLim(1).*0.67), '-', 'LineWidth', 3, 'Color', standard_colors('etc'))
 end
 
 % For placebo
-[~, YData] = withinSubMean(T(pcfg.idx.pbo.(fld), :), 'smtdata', 1);
+[~, YData] = within_sub_mean(T(pcfg.idx.pbo.(fld), :), 'smtdata', 1);
 YData = YData';
 EData = tinv(0.975, size(YData, 2)-1).*(std(YData, [], 2)./sqrt(size(YData, 2)));
 errorpatch(Ax, XData, mean(YData, 2), EData, ...
-    'FaceColor', css_standard_colors('pbo'), ...
+    'FaceColor', standard_colors('pbo'), ...
     'FaceAlpha', 0.3);
 p(1) = plot(Ax, XData, mean(YData, 2), '-', ...
     'LineWidth', 1, ...
-    'Color', css_standard_colors('pbo'));
+    'Color', standard_colors('pbo'));
 
 % For THC/CBD
-[~, YData] = withinSubMean(T(pcfg.idx.etc.(fld), :), 'smtdata', 1);
+[~, YData] = within_sub_mean(T(pcfg.idx.etc.(fld), :), 'smtdata', 1);
 YData = YData';
 EData = tinv(0.975, size(YData, 2)-1).*(std(YData, [], 2)./sqrt(size(YData, 2)));
 errorpatch(Ax, XData, mean(YData, 2), EData, ...
-    'FaceColor', css_standard_colors('etc'), ...
+    'FaceColor', standard_colors('etc'), ...
     'FaceAlpha', 0.3);
 p(2) = plot(Ax, XData, mean(YData, 2), '-', ...
     'LineWidth', 1, ...
-    'Color', css_standard_colors('etc'));
+    'Color', standard_colors('etc'));
 
 if strcmpi(fld, 'cs')
     l = legend(p, {'placebo', 'THC/CBD'}, ...

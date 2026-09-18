@@ -1,5 +1,5 @@
-function theta_corr = correctPhaseByEmpiricalCDF(theta)
-% correctPhaseByEmpiricalCDF
+function theta_corr = correct_phase_by_empirical_cdf(theta)
+% correct_phase_by_empirical_cdf
 %
 % Corrects circular phase angles for a non-uniform background phase
 % distribution using a probability integral transform (PIT).

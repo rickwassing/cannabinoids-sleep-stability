@@ -29,6 +29,6 @@ for i = 1:ISF.nbchan
     FIT(i).offset = this_fit.offset;
 end
 % Extract the features used in group level analysis
-ISF.features = css_extractfeatures(FIT, ISF);
+ISF.features = extract_isf_features(FIT, ISF);
 
 end
