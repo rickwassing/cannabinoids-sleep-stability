@@ -1,4 +1,4 @@
-%function css_analyse_2
+function analyse_arousal_isf_phase()
 % -------------------------------------------------------------------------
 % Use the the 130-second pre-arousal bouts of continuous N2 sleep to
 % determine the phase angle, amplitude (hilbert) between state-shift
@@ -413,3 +413,5 @@ exportgraphics(Fig, './figures/supp_2b_phase-coupling_fz.png', 'Resolution', 600
 
 %%
 clear ans i pcfg
+
+end

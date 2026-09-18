@@ -1,4 +1,4 @@
-function css_plot_1c(type, varargin)
+function plot_isf_topography(type, varargin)
 
 
 chanlocs = template_to_chanlocs(which('GSN-HydroCel-257.sfp'));

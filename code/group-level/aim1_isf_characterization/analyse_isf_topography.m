@@ -1,4 +1,4 @@
-function css_analyse_1c()
+function analyse_isf_topography()
 % -------------------------------------------------------------------------
 % Visually inspect the IFS spectra and interpolate bad channels
 Files = dir('derivatives/EEG-output-fstlvl/sub-*/ses-*/sub-*_desc-a1c*sigma_fstlvl.mat');
@@ -105,5 +105,5 @@ fprintf('No difference in the time of the night of selected bouts (t(%i) = %.2f,
     mdl.Coefficients.pValue(2))
 
 % Create the figure
-css_plot_1c('abs')
-css_plot_1c('norm')
+plot_isf_topography('abs')
+plot_isf_topography('norm')

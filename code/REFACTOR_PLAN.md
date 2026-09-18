@@ -430,11 +430,40 @@ mapping confirmation — read-only reference, not edited).
       output / figure output to a pre-refactor run.
 
 **Actions:**
-- [ ] Execute all `git mv` + function-wrapping edits per 4a–4i.
-- [ ] Update every cross-reference between these files (e.g., 4c calling 4d) to use new names.
-- [ ] `grep -rn` for every old function name (`css_analyse_1a`, `css_analyse_1b`, ..., `css_descriptives`,
+- [x] Execute all `git mv` + function-wrapping edits per 4a–4i.
+- [x] Update every cross-reference between these files (e.g., 4c calling 4d) to use new names.
+- [x] `grep -rn` for every old function name (`css_analyse_1a`, `css_analyse_1b`, ..., `css_descriptives`,
       `css_plot_1c`, `css_analyse_isf_phase_distribution`) across `code/` and confirm the only
-      remaining reference is in `code/pipeline/main.m` (updated in Phase 5) and this plan file.
+      remaining reference is in `code/main.m` (updated in Phase 5) and this plan file.
+
+**Phase 4 completed 2026-09-18.** Notes:
+- All 9 `git mv` renames done via `code/analysis/*.m` → `code/group-level/<aim-folder>/*.m`;
+  `git status --short` confirms all 9 as `RM` (rename+modify), preserving history.
+- 4a (`analyse_bout_selection.m`) and 4c (`analyse_isf_topography.m`) were listed as "pure
+  rename + move" in this plan, but since MATLAB requires a file's primary function name to match
+  its filename to be callable, their internal `function css_analyse_1a()` / `function
+  css_analyse_1c()` declarations were also renamed to `function analyse_bout_selection()` /
+  `function analyse_isf_topography()` respectively (beyond just the file move) — noting this as
+  a deviation-in-degree from "pure move", though it introduces no logic change, matching the
+  spirit of every other 4b–4i conversion in this phase.
+- 4b bug-fix applied exactly as specified: `for f = 1:length(Files)` → `for f =
+  1:length(SigmaFiles)` in `analyse_sigma_spindle_similarity.m`, with an inline comment marking
+  it as a bug-fix.
+- 4f's mislabelled `%function css_analyse_2` comment corrected to `function
+  analyse_arousal_isf_phase()` as specified.
+- The pre-existing `N%%` stray-token typo in `analyse_filter_edge_artefact.m` (line 248, a
+  malformed cell-divider) was found again during Phase 4 and **left untouched** — out of scope
+  per the plan's "no logic changes beyond the one approved 4b bug-fix" rule.
+- 4i's `% NOTE:` comment was **not** copied verbatim from this plan's original wording, because
+  re-verification during Phase 4 found `analyse_filter_edge_artefact.m` (formerly
+  `css_analyse_2a.m`) *does* contain `save('analysis_2a.mat', ..., 'ANGA', ...)`, contradicting
+  this plan's claim that "grep found no `save(..., 'ANGA'...)`". The NOTE actually written flags
+  the real ambiguity instead (working-directory-relative save path vs. expected load location),
+  rather than repeating a now-inaccurate claim.
+- All 9 converted files spot-checked for balanced `function`/`end` pairing (via
+  `grep -c '^end$'` / `grep -c '^function'` and manual line-context review) — no double-`end` or
+  missing `end` introduced by the wrapping edits.
+- `code/analysis/` directory removed (now empty, fully drained).
 
 **Skills/tools:** `read_files` (side-by-side comparison), `editor` (function wrapping, renames),
 `run_commands` (`git mv`, `grep`). No MCP server needed. If available to you locally, MATLAB's
@@ -529,7 +558,7 @@ Phases 1–5 (for the traceability table).
 - [x] Phase 2 — Subject-level + first-level reorganisation (2026-09-18; correction added
       2026-09-18 re: manual edits post-completion — see Phase 2 section)
 - [x] Phase 3 — utils/ categorisation (+ batch confirmation of flagged items) (2026-09-18)
-- [ ] Phase 4 — Group-level reorganisation + script→function conversion
+- [x] Phase 4 — Group-level reorganisation + script→function conversion (2026-09-18)
 - [ ] Phase 5 — main.m update
 - [ ] Phase 6 — README + final verification
 

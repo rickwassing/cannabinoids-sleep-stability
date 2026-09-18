@@ -1,3 +1,4 @@
+function analyse_rem_transition_dynamics()
 % -------------------------------------------------------------------------
 % Load all REM onsets and plot the ~100 seconds of sigma ISF
 SigmaFiles = dir('derivatives/EEG-segmented/sub-*/ses-*/sub-*-sigmaprerembout_pow.set');
@@ -338,5 +339,7 @@ if strcmpi(chans.sel, 'fz')
     exportgraphics(Fig, './figures/figure3_fz.png', 'Resolution', 1200)
 else
     exportgraphics(Fig, './figures/figure3_pz.png', 'Resolution', 1200)
+end
+
 end
 

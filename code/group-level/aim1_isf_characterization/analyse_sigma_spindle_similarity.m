@@ -1,4 +1,4 @@
-% function css_analyse_1b()
+function analyse_sigma_spindle_similarity()
 % -------------------------------------------------------------------------
 % STEP 1:
 % Use 300-second bouts of continuous N2 sleep to describe the sigma/spindle
@@ -10,7 +10,7 @@ force = false;
 SigmaFiles = dir('derivatives/EEG-segmented/sub-*/ses-*/sub-*_desc-sigmanrembout*.set');
 SpdFiles = dir('derivatives/EEG-segmented/sub-*/ses-*/sub-*_desc-spindlefdznrembout*.set');
 TBL = table();
-for f = 1:length(Files)
+for f = 1:length(SigmaFiles)
     hdr = LoadDataset(fullfile(SigmaFiles(f).folder, SigmaFiles(f).name), 'header');
     kv = filename2struct(hdr.setname);
     outfname = sprintf('sub-%s_ses-%s_task-psg_desc-a1b_fstlvl.mat', kv.sub, kv.ses);
@@ -164,4 +164,4 @@ CBar(2).Ticks = Ax(3).CLim;
 disp('Saving figure...')
 exportgraphics(Fig, 'figures/supp_1.png', 'Resolution', 1200)
 disp('Done saving')
-% end
+end

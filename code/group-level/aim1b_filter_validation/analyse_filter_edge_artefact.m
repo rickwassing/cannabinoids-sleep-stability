@@ -1,4 +1,4 @@
-% function css_analyse_2a
+function analyse_filter_edge_artefact()
 clc
 clear
 close all
@@ -426,4 +426,4 @@ end
 exportgraphics(Fig, sprintf('figures/supp_2_append-%s.png', append_type), 'Resolution', 300)
 disp('Done saving')
 
-% end
+end

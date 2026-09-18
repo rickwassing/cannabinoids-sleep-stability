@@ -1,3 +1,4 @@
+function analyse_sleep_macroarchitecture_and_arousal_outcomes()
 % Load data
 PSG = readtable('phenotype/2024-07-26T171508_psg-variables.csv');
 ARO = readtable('phenotype/2024-07-26T171508_arousals.csv');
@@ -310,6 +311,8 @@ for s = 1:length(stages)
 end
 
 exportgraphics(Fig, 'figures/fig_arousal_descriptives.png', 'Resolution', 600);
+
+end
 
 
 function str = stringifypvalue(p)

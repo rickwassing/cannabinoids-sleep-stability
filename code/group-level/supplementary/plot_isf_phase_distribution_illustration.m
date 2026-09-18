@@ -1,8 +1,6 @@
-clear
+function plot_isf_phase_distribution_illustration()
 
 load('analysis_2a.mat', 'ANGA');
-
-%%
 
 XData = 0:pi/180:100*pi;
 YData = sin(XData);
@@ -35,10 +33,6 @@ plot(Ax, XData, YData, '-', 'Color', [0.839, 0.847, 0.863], ...
     'LineWidth', 3)
 plot(Ax, XData, AData, ':', 'Color', 'k', ...
     'LineWidth', 1)
-
-%%
-
-
 
 pcfg = struct();
 pcfg.resolution = 30;
@@ -119,3 +113,5 @@ h(1).FaceColor = css_standard_colors('bluegrey');
 Ax(1).Position([1 3]) = Ax(2).Position([1 3]);
 
 exportgraphics(Fig, './figures/supp_phaseangledistribution.png', 'Resolution', 600)
+
+end
