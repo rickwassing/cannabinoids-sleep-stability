@@ -1,3 +1,5 @@
+% ARCHIVED 2026-09-18: superseded by css_plot_1c.m; not called from main.m or any
+% analysis script.
 function css_plot_isffeatures(type, varargin)
 
 % Load group-level results, colormap, and chanlocs

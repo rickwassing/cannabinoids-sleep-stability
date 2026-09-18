@@ -1,3 +1,6 @@
+% ARCHIVED 2026-09-18: superseded by css_analyse_2a.m (filter edge-artefact validation);
+% kept for provenance, not called from main.m.
+% -------------------------------------------------------------------------
 %function css_analyse_2
 % -------------------------------------------------------------------------
 % Use the the 130-second pre-arousal bouts of continuous N2 sleep to

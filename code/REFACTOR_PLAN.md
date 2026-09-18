@@ -67,12 +67,12 @@ data only — NOT the same as the new `code/group-level/` code folder proposed b
 **Read first:** `@code/REFACTOR_PLAN.md` (this file, to confirm it matches what was approved).
 
 - [x] Write this plan file (done).
-- [ ] Create the new directory skeleton (empty folders, so `git mv` targets exist):
+- [x] Create the new directory skeleton (empty folders, so `git mv` targets exist):
   `code/pipeline/`, `code/subject-level/{preprocessing,arousal-detection,spectral-features,segmentation,inspection}/`,
   `code/firstlevel-outcomes/`, `code/group-level/{aim1_isf_characterization,aim1b_filter_validation,aim2_nrem_sleep_stability/plotting,aim3_rem_transitions/plotting,sleep_macroarchitecture,supplementary}/`,
   `code/utils/{eeg-io,signal-processing,spindle-detection,circular-stats,isf-fitting,arousal-bouts,plotting-generic,signal-append,misc}/`,
-  `code/archive/{pipeline,analysis,scratch}/`.
-- [ ] Confirm `code/qc/` and `code/toolboxes/` remain untouched (no action needed).
+  `code/archive/{pipeline,analysis,scratch}/`. **Done 2026-09-18.**
+- [x] Confirm `code/qc/` and `code/toolboxes/` remain untouched (no action needed). **Confirmed unchanged.**
 
 **Skills/tools:** `run_commands` (`mkdir -p`) only. No MCP server needed.
 
@@ -93,15 +93,21 @@ data only — NOT the same as the new `code/group-level/` code folder proposed b
 (All already read once during planning — re-read only if resuming in a new session.)
 
 **Actions:**
-- [ ] `git mv code/archive/main_mbpro.m code/archive/main_mbpro.asv code/archive/main_supc.m code/archive/main_supc.asv code/archive/css_figure1.m code/archive/spectral_determinants.m code/archive/pipeline/` (note: `.asv` files are MATLAB autosave files already gitignored via `*.asv` — check whether they're tracked before moving; if untracked, just leave/delete per `.gitignore` semantics, don't force-add).
-- [ ] `git mv code/archive/tmp_checkN1.m code/archive/tmp_inspect_tstat_spectra.m code/archive/tmp_iso_freqlimits.m code/archive/tmp_recalcgausfit.m code/archive/tmp_recalcismphase.m code/archive/scratch/`
-- [ ] `git mv code/analysis/archive/*.m code/archive/analysis/`
-- [ ] `git mv code/analysis/css_analyse_2.m code/archive/analysis/css_analyse_2.m` — add a one-line header comment: `% ARCHIVED <date>: superseded by css_analyse_2a.m (filter edge-artefact validation); kept for provenance, not called from main.m.`
-- [ ] `git mv code/analysis/css_plot_isffeatures.m code/archive/analysis/css_plot_isffeatures.m` — header comment: `% ARCHIVED <date>: superseded by css_plot_1c.m; not called from main.m or any analysis script.`
-- [ ] `git mv code/tmp/analyze_signal_frequencies.m code/archive/scratch/analyze_signal_frequencies.m`
-- [ ] `git mv code/check.m code/archive/scratch/check.m`
-- [ ] Remove now-empty `code/analysis/archive/`, `code/tmp/` directories.
-- [ ] `grep -rn` for the old archived filenames across `code/` to confirm zero remaining references (expected: zero, since these were already established as unreferenced during planning).
+- [x] `git mv` main_mbpro.m/.asv, main_supc.m/.asv, css_figure1.m, spectral_determinants.m → `code/archive/pipeline/`. (`.asv` files confirmed untracked/gitignored, moved with plain `mv`.)
+- [x] `git mv` the 5 `tmp_*.m` files → `code/archive/scratch/`.
+- [x] `git mv code/analysis/archive/*.m` → `code/archive/analysis/` (incl. untracked `.asv`).
+- [x] `git mv code/analysis/css_analyse_2.m` → `code/archive/analysis/css_analyse_2.m` — header comment added.
+- [x] `git mv code/analysis/css_plot_isffeatures.m` (+ untracked `.asv`) → `code/archive/analysis/css_plot_isffeatures.m` — header comment added.
+- [x] `git mv code/tmp/analyze_signal_frequencies.m` → `code/archive/scratch/analyze_signal_frequencies.m`
+- [x] `git mv code/check.m` → `code/archive/scratch/check.m`
+- [x] Removed now-empty `code/analysis/archive/`, `code/tmp/` directories.
+- [x] `grep -rn` (word-boundary) for the old archived filenames across `code/` — **zero dangling
+      functional references confirmed.** One pre-existing, harmless typo found and left for
+      Phase 4 (a comment `%function css_analyse_2` inside the *still-active* `css_analyse_2b.m`,
+      mislabelling itself — not a reference to the archived file; will be corrected when
+      `css_analyse_2b.m` is renamed in Phase 4f).
+
+**Phase 1 completed 2026-09-18.**
 
 **Skills/tools:** `run_commands` (`git mv`, `grep`), `editor` (header comments). No MCP server needed.
 
@@ -450,8 +456,8 @@ Phases 1–5 (for the traceability table).
 
 ## Execution Checklist
 
-- [ ] Phase 0 — Setup
-- [ ] Phase 1 — Archive consolidation
+- [x] Phase 0 — Setup (2026-09-18)
+- [x] Phase 1 — Archive consolidation (2026-09-18)
 - [ ] Phase 2 — Subject-level + first-level reorganisation
 - [ ] Phase 3 — utils/ categorisation (+ batch confirmation of flagged items)
 - [ ] Phase 4 — Group-level reorganisation + script→function conversion
