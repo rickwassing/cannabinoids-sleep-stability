@@ -66,7 +66,6 @@ HYP = css_eeglab2hypnogram(EEG);
 % -------------------------------------------------------------------------
 % Find the arousal bouts
 [EEG, arousalbouts] = getarousalbouts(EEG, HYP, cfg);
-keyboard
 % -------------------------------------------------------------------------
 % Select parts of the data for each arousal and their pre-arousal N2 sleep
 if ~isempty(arousalbouts)

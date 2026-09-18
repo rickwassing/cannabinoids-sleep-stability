@@ -1,3 +1,8 @@
+% ARCHIVED 2026-09-18: no call sites found anywhere in code/ (SRP_REFACTOR_PLAN.md
+% Phase 1 dead-code audit); superseded by css_infraslowfluctpowerspect.m /
+% fitisfspect.m, the ISF-fitting pipeline actually wired into main.m. Kept for
+% provenance, not called from main.m.
+% -------------------------------------------------------------------------
 function [st_Abs,st_Rel, v_SpPhase] = f_IFO_WithSpindles(m_Traces, s_Fs , v_TimeBouts , v_TimeSpindles , str_name , b_ToPlot)
     % f_IFO is the basic function to do the infraslow anaylsis. It uses the
     % dynamics of sigma from the f_MGT between 12 and 16.

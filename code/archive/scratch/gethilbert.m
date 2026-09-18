@@ -1,3 +1,6 @@
+% ARCHIVED 2026-09-18: no call sites found anywhere in code/ (SRP_REFACTOR_PLAN.md
+% Phase 1 dead-code audit); kept for provenance, not called from main.m.
+% -------------------------------------------------------------------------
 function [POW, bouts] = gethilbert(SPEC, HYP, freqs)
 
 % Select NREM stage 2 and 3 time segments during sws and asc sleep

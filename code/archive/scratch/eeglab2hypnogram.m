@@ -1,3 +1,9 @@
+% ARCHIVED 2026-09-18: byte-for-byte duplicate of utils/eeg-io/css_eeglab2hypnogram.m
+% (SRP_REFACTOR_PLAN.md Phase 2). Its only caller,
+% subject-level/spectral-features/css_extractspindles.m, was pointed at
+% css_eeglab2hypnogram instead (the version every other caller in code/ already used).
+% Kept for provenance, not called from main.m.
+% -------------------------------------------------------------------------
 function HYP = eeglab2hypnogram(EEG)
 % Extract sleep stages
 HYP = EEG.event(ismember(lower({EEG.event.type}), {'n1', 'n2', 'n3', 'w', 'r', 'wake', 'rem', 's1', 's2', 's3', 'nrem1', 'nrem2', 'nrem3', '1', '2', '3'}));

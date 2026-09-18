@@ -1,3 +1,6 @@
+% ARCHIVED 2026-09-18: no call sites found anywhere in code/ (SRP_REFACTOR_PLAN.md
+% Phase 1 dead-code audit); kept for provenance, not called from main.m.
+% -------------------------------------------------------------------------
 function [v,p,V,VAR,CI] = csapsGCV(x,y,p,xx,W)
 % Written by Matthew Taliaferro
 %    The function outputs the values from the spline interpolation, v, the

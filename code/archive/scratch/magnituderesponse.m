@@ -1,3 +1,6 @@
+% ARCHIVED 2026-09-18: no call sites found anywhere in code/ (SRP_REFACTOR_PLAN.md
+% Phase 1 dead-code audit); kept for provenance, not called from main.m.
+% -------------------------------------------------------------------------
 function [f, db, filtorder] = magnituderesponse(wintype, freqs, transbw, srate, filtorder)
 
 % Filter order

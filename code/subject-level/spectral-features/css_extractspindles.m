@@ -16,7 +16,7 @@ try
     end
     % -------------------------------------------------------------------------
     % Get hypnogram table
-    HYP = eeglab2hypnogram(EEG);
+    HYP = css_eeglab2hypnogram(EEG);
     try
         HYP.sleepstage = HYP.stage_num;
     catch ME

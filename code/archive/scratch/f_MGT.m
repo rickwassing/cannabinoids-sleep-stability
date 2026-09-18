@@ -1,3 +1,7 @@
+% ARCHIVED 2026-09-18: no call sites found anywhere in code/ outside the also-unused
+% f_IFO_Parameters_140324.m / f_IFO_WithSpindles.m (SRP_REFACTOR_PLAN.md Phase 1
+% dead-code audit); kept for provenance, not called from main.m.
+% -------------------------------------------------------------------------
 function [m_Transform,v_freq] = f_MGT(v_Signal,s_Fr,minf,maxf,resf);
 % This function calculates the wavelet transform of a signal of interest
 % using a Gabor-Morlet kernel.

@@ -1,3 +1,7 @@
+% ARCHIVED 2026-09-18: no call sites found anywhere in code/ outside the also-unused
+% eeg2freqbandpower.m (SRP_REFACTOR_PLAN.md Phase 1 dead-code audit); kept for
+% provenance, not called from main.m.
+% -------------------------------------------------------------------------
 function [m_Transform, v_freq] = morletgabortransform(eegsignal, srate, freqlo, freqhi, freqres)
 
 % This function calculates the wavelet transform of a signal of interest

@@ -1,3 +1,7 @@
+% ARCHIVED 2026-09-18: no call sites found anywhere in code/ (SRP_REFACTOR_PLAN.md
+% Phase 1 dead-code audit); superseded by EEG_Processor's plotHypnogram, which is
+% what every active caller in code/ actually uses. Kept for provenance.
+% -------------------------------------------------------------------------
 function Ax = plothypno(Fig, XLim, ARO, HYP, srate)
 Ax = uiaxes(Fig, ...
     'Box', 'on', ...

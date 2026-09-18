@@ -1,3 +1,6 @@
+% ARCHIVED 2026-09-18: no call sites found anywhere in code/ (SRP_REFACTOR_PLAN.md
+% Phase 1 dead-code audit); kept for provenance, not called from main.m.
+% -------------------------------------------------------------------------
 function [z,s] = smooth1q(y,s,varargin)
 
 %SMOOTH1Q Quick & easy smoothing.
@@ -69,7 +72,7 @@ function [z,s] = smooth1q(y,s,varargin)
 %   axis tight square
 %   title('Robust')
 %
-%   % Limaçon
+%   % Limaï¿½on
 %   t = linspace(0,2*pi,300);
 %   x = cos(t).*(.5+cos(t)) + randn(size(t))*0.05;
 %   y = sin(t).*(.5+cos(t)) + randn(size(t))*0.05;

@@ -1,3 +1,9 @@
+% ARCHIVED 2026-09-18: no call sites found anywhere in code/ (SRP_REFACTOR_PLAN.md
+% Phase 1 dead-code audit); superseded by css_infraslowfluctpowerspect.m /
+% fitisfspect.m, the ISF-fitting pipeline actually wired into main.m. Only
+% referenced internally by the also-unused f_IFO_WithSpindles.m. Kept for
+% provenance, not called from main.m.
+% -------------------------------------------------------------------------
 function [mean_gauss_PF,mean_gauss_Peak, bandwidth_gauss, mean_gauss_AUC_specified, mean_gauss_AUC_standardrange,power_normalized_mean_FFT] = f_IFO_Parameters_140324(traces, s_Fs, name,b_ToPlot)
 
 if nargin<4

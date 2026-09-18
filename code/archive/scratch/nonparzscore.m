@@ -1,3 +1,6 @@
+% ARCHIVED 2026-09-18: no call sites found anywhere in code/ (SRP_REFACTOR_PLAN.md
+% Phase 1 dead-code audit); kept for provenance, not called from main.m.
+% -------------------------------------------------------------------------
 function [z,mu,sigma] = nonparzscore(x,flag,dim)
 %ZSCORE Non-parametric standardized z score.
 %   Z = NONPARZSCORE(X) returns a centered, scaled version of X, the same size as X.
