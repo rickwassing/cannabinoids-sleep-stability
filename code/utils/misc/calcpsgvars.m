@@ -1,3 +1,10 @@
+% NOTE: no current call sites found in code/ as of 2026-09-18 (Phase 3
+% refactor). Name strongly suggests this generates the phenotype CSVs
+% consumed by the sleep-macroarchitecture analysis
+% (phenotype/2024-07-26T171508_psg-variables.csv / ..._arousals.csv), but
+% that generation may happen outside this repo. Kept (not archived) to
+% avoid hiding a data-generation function whose output may still be in
+% use; flagged for your review.
 function t = calcpsgvars(hyp)
 
 idx_sleep_period = find(ismember(hyp, {'n1', 'n2', 'n3', 'rem'}), 1, 'first'):find(ismember(hyp, {'n1', 'n2', 'n3', 'rem'}), 1, 'last');

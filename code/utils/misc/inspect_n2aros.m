@@ -1,4 +1,8 @@
-
+% NOTE: no current call sites found in code/ as of 2026-09-18 (Phase 3
+% refactor). This is a bare script (not a function), likely an
+% interactive/manual QC snippet. Kept in utils/misc/ rather than archived,
+% since unclear current usage does not necessarily mean unused; flagged
+% for your review.
 
 ARO = [];
 

@@ -126,9 +126,9 @@ data only — NOT the same as the new `code/group-level/` code folder proposed b
 `@code/section.m`, `@code/main.m`.
 (All already read during planning; re-read if resuming fresh.)
 
-**File moves:**
+**File moves (as originally planned):**
 
-| Current path | New path | Notes |
+| Current path | Planned new path | Notes |
 |---|---|---|
 | `code/processing/css_preproc.m` | `code/subject-level/preprocessing/css_preproc.m` | pure move |
 | `code/processing/css_init.m` | `code/subject-level/preprocessing/css_init.m` | pure move |
@@ -147,6 +147,33 @@ data only — NOT the same as the new `code/group-level/` code folder proposed b
 | `code/analysis/css_createfstlvloutput.m` | `code/firstlevel-outcomes/css_createfstlvloutput.m` | pure move |
 | `code/section.m` | `code/pipeline/run_processing_section.m` | pure move + rename; update internal `function [errors] = section(...)` signature name to `run_processing_section` to match filename (MATLAB requires function name == filename) |
 | `code/main.m` | `code/pipeline/main.m` | pure move; content updated in Phase 5 |
+
+**⚠️ CORRECTION (added 2026-09-18, after manual edits by repo owner post-Phase-2):**
+The table above is the *original plan*. What actually landed on disk (confirmed via
+`git show 5bf8aa8 --name-status -M` and a fresh `find code -type f`) diverges from it in seven
+places — apparently due to manual edits made outside this planning session. The original Phase 2
+completion note below incorrectly asserted "no other discrepancy found"; that assertion is now
+corrected. **Actual, current on-disk state (authoritative going forward):**
+
+| File | Plan said | What's actually on disk now |
+|---|---|---|
+| `code/processing/css_init.m` | → `code/subject-level/preprocessing/css_init.m` | → **`code/css_init.m`** (kept at `code/` root, alongside `main.m`) |
+| `code/main.m` | → `code/pipeline/main.m` | **Still at `code/main.m`** (not moved; `code/pipeline/` currently holds only `run_processing_section.m`) |
+| `code/processing/css_detectarousals.m` | → `code/subject-level/arousal-detection/...` | **Deleted** (no destination; no remaining references in `code/main.m` or elsewhere) |
+| `code/processing/css_extractarousalbouts.m` | → `code/subject-level/arousal-detection/...` | → **`code/subject-level/segmentation/css_extractarousalbouts.m`** (landed in `segmentation/`, not a separate `arousal-detection/` folder) |
+| `code/processing/css_inspectspindles.m` | → `code/subject-level/inspection/...` | → **`code/qc/css_inspectspindles.m`** (routed into the pre-existing `qc/` folder instead of a new `inspection/` folder) |
+| `code/processing/html/*` | → `code/subject-level/inspection/html/*` | **Deleted** (generated output viewer removed, not relocated) |
+| `code/toolboxes/pngquality.py` | not part of Phase 2 (toolboxes out of scope) | **Deleted** |
+
+Net effect: the empty `code/subject-level/arousal-detection/` and `code/subject-level/inspection/`
+directories created in Phase 0 are no longer present on disk (nothing was ever moved into them, and
+they were not tracked as empty dirs by git), and `code/pipeline/` holds only
+`run_processing_section.m`, not `main.m`. All other rows in the table above were executed exactly
+as planned. This correction is documentation-only — **no file moves were made or reversed as part
+of this correction**; the current on-disk layout (root-level `code/main.m` + `code/css_init.m`,
+`code/qc/css_inspectspindles.m`, `code/subject-level/segmentation/css_extractarousalbouts.m`, no
+`css_detectarousals.m`) is treated as the accepted, intentional state and is what later phases
+(5 and 6) should reference and document, not the original table.
 
 **Note on `css_infraslowfluctpowerspect.m` / `css_crosscorr.m`:** these two functions do subject-level
 signal processing AND save the final first-level output (`css_createfstlvloutput`) in one function
@@ -172,6 +199,12 @@ method, model specification, threshold, filter parameter, or numeric result was 
 was pure relocation plus the one approved function rename (`section` → `run_processing_section`).
 `code/processing/` is now drained of all `.m` files (only an empty, pre-existing, untracked
 `code/processing/archive/` and `.DS_Store` remain — directory removal deferred to Phase 6 per plan).
+
+**Correction (2026-09-18, later same day):** the "no other discrepancy found" claim above was
+inaccurate. Manual edits made after this note was written diverged from the file-moves table in
+seven places — see the "⚠️ CORRECTION" block above the table for the authoritative current
+on-disk state. Re-verified via `git status --short` (clean) and `find code -maxdepth 2 -type d`
+before starting Phase 3.
 
 **Skills/tools:** `run_commands` (`git mv`, `grep`), `editor` (function-name rename in `run_processing_section.m`, call-site updates). No MCP server needed.
 
@@ -264,20 +297,43 @@ been added/changed since planning.
 (→ into `.../aim3_rem_transitions/plotting/`).
 
 **Actions:**
-- [ ] Re-verify each "Flag for confirmation" item with you (batch these into one confirmation
-      round rather than asking one at a time) before moving — this phase has the highest number
-      of judgment calls.
-- [ ] Execute `git mv` for all non-flagged (A–C, E's core list, F, G's core list, H's core list,
-      I's active file + plotting, J) files per the category tables.
-- [ ] After each category's moves, `grep -rn "\b<oldfilename_without_ext>\b" code/` to confirm no
-      broken references (again, folder moves are path-transparent under `addpath(genpath('code'))`,
-      so this is a confirmation step, not a fix-required step, unless a file was referenced by a
-      hardcoded string path rather than a bare function call).
-- [ ] Delete now-empty `code/supportfunc/` once fully drained.
+- [x] Re-verified each "Flag for confirmation" item via `search_codebase` before moving — all
+      still showed zero call sites in `code/` outside this plan doc, matching original planning
+      findings. Batch-confirmed with you in one round: **all 5 proposals approved as documented**
+      (infraslowmodpowerspect.m/_old.m/extractismphase.m → archive/scratch; tmp_spindle_detection.m
+      → archive/scratch, convspindles.m → utils/spindle-detection/ with NOTE; the 8 unreferenced
+      plot/QC scripts → archive/scratch; withinConditionNorm.m/calcarovars.m/calcpsgvars.m/
+      loadarousalcsvs.m/loadarousalepochs.m/inspect_n2aros.m → kept in utils/misc/ with NOTE
+      comments added; prearousal_permutation_models.m (non-optimized) → archive/analysis).
+- [x] Executed `git mv` for all 95 `code/supportfunc/*.m` files per the category tables (A–J plus
+      all flagged items per the confirmed proposals above): 8 → `utils/eeg-io/`, 15 →
+      `utils/signal-processing/`, 7 → `utils/signal-append/`, 7 → `utils/isf-fitting/` (+3 flagged
+      → `archive/scratch/`), 7 → `utils/spindle-detection/` (incl. `convspindles.m`; +1 flagged
+      `tmp_spindle_detection.m` → `archive/scratch/`), 8 → `utils/circular-stats/`, 7 →
+      `utils/plotting-generic/` (+8 flagged → `archive/scratch/`), 8 → `utils/misc/` (incl. the 6
+      flagged-but-kept files), 8 → `group-level/aim2_nrem_sleep_stability/` (1 active +7
+      plotting), 7 → `group-level/aim3_rem_transitions/` (1 active +6 plotting), 1 flagged →
+      `archive/analysis/` (`prearousal_permutation_models.m`). Total: 67 files landed in
+      `code/utils/`, 20 in `code/group-level/` group-2/3 helper folders, 8 net-new in
+      `code/archive/{scratch,analysis}/`. All via `git mv` (confirmed as renames in
+      `git status --short`, history preserved).
+- [x] Added `% NOTE:` comments (call-site status + rationale for not archiving) to the 7 files
+      kept despite having no confirmed call sites: `convspindles.m`, `withinConditionNorm.m`,
+      `calcarovars.m`, `calcpsgvars.m`, `loadarousalcsvs.m`, `loadarousalepochs.m`,
+      `inspect_n2aros.m`.
+- [x] `grep -rn "\b<oldfilename_without_ext>\b" code/` per category — no broken references found;
+      all moved functions still resolve via `addpath(genpath('code'))` (folder-agnostic dispatch).
+      Final sweep `grep -rn "supportfunc" --include='*.m' .` across the whole repo returned zero
+      matches (only this plan file still mentions the word, in already-completed-phase notes).
+- [x] Deleted now-empty `code/supportfunc/` (fully drained; `rmdir` succeeded).
+
+**Phase 3 completed 2026-09-18.** All moves via `git mv` (history preserved, confirmed via
+`git status --short` showing `R` for all 95 files). No statistical method, model specification,
+threshold, filter parameter, or numeric result was changed — pure categorisation/relocation plus
+the approved NOTE-comment additions on 7 kept-but-unreferenced files.
 
 **Skills/tools:** `search_codebase` (re-verify call sites), `run_commands` (`git mv`, `grep`),
-`ask_question` or a single consolidated message to batch-confirm the flagged items with you.
-No MCP server needed.
+`ask_question` (batch-confirmed flagged items with you in one round). No MCP server needed.
 
 
 ---
@@ -470,8 +526,9 @@ Phases 1–5 (for the traceability table).
 
 - [x] Phase 0 — Setup (2026-09-18)
 - [x] Phase 1 — Archive consolidation (2026-09-18)
-- [x] Phase 2 — Subject-level + first-level reorganisation (2026-09-18)
-- [ ] Phase 3 — utils/ categorisation (+ batch confirmation of flagged items)
+- [x] Phase 2 — Subject-level + first-level reorganisation (2026-09-18; correction added
+      2026-09-18 re: manual edits post-completion — see Phase 2 section)
+- [x] Phase 3 — utils/ categorisation (+ batch confirmation of flagged items) (2026-09-18)
 - [ ] Phase 4 — Group-level reorganisation + script→function conversion
 - [ ] Phase 5 — main.m update
 - [ ] Phase 6 — README + final verification

@@ -1,3 +1,6 @@
+% NOTE: no current call sites found in code/ as of 2026-09-18 (Phase 3
+% refactor). Kept here (rather than archived) since the name doesn't
+% obviously indicate scratch/superseded status; flagged for your review.
 function EEG = convspindles(EEG, s)
 
 x = -6*s:1/EEG.srate:6*s;

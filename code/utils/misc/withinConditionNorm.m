@@ -1,3 +1,6 @@
+% NOTE: no current call sites found in code/ as of 2026-09-18 (Phase 3
+% refactor). Kept in utils/misc/ rather than archived, since unclear
+% current usage does not necessarily mean unused; flagged for your review.
 function normdata = withinConditionNorm(T, method)
 
 Subs = unique(T.sub);
