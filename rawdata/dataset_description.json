@@ -1,0 +1,26 @@
+{
+	"Name": "Arousal paper backup_CANSLEEP",
+	"BIDSVersion": "1.8.0",
+	"DatasetType": "raw",
+	"GeneratedBy": {
+		"Name": "Woolcock Institute of Medical Research, Sydney, Australia",
+		"Version": "11/02/2022",
+		"Description": "Preprocessing and analysis pipeline for high-density EEG (sleep) recordings in healthy controls and affected populations."
+	},
+	"License": "Public Domain",
+	"Authors": [
+		""
+	],
+	"Acknowledgements": "",
+	"HowToAcknowledge": "",
+	"Funding": [
+		""
+	],
+	"EthicsApprovals": [
+		""
+	],
+	"ReferencesAndLinks": [
+		""
+	],
+	"DatasetDOI": "10.xxxx"
+}

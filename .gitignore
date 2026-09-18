@@ -42,3 +42,28 @@ Temporary Items
 *.tmp
 *.temp
 .DS_Store
+
+# Office lock files
+~$*
+
+# -------------------------------------------------------------------------
+# BIDS dataset: large/derived/private data folders (secondary analysis of
+# an existing dataset; data are stored separately and are not part of the
+# code repository, only the analysis code and lightweight BIDS metadata are
+# tracked here)
+# -------------------------------------------------------------------------
+/derivatives/
+/group-level/
+/permutation-runs/
+/inspect/
+/issy backup/
+/phenotype/
+/figures/
+/documents/
+
+# Loose data files at the dataset root
+/participants.csv
+/participants.xlsx
+/age-matching.xlsx
+/Scoring log and notes_CANSLEEP arousal.xlsx
+/inspect-isf.html

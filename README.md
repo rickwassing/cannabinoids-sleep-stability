@@ -4,15 +4,20 @@
 
 This repository contains the analysis code for a research project evaluating sleep stability in insomnia. The study investigates how sleep stability, or rather its instability, can be explained by infraslow fluctuations in sigma power, a proxy measure of LC activity during NREM sleep.
 
+This repository is organized as a [Brain Imaging Data Structure (BIDS)](https://bids.neuroimaging.io/) dataset. Because this is a secondary analysis of an existing dataset, the raw/source data and derivatives are stored separately and are not part of this repository (see `.gitignore`); only the analysis code and lightweight BIDS metadata are tracked here.
+
 ## Project Structure
 
 ```
-├── analysis/             # Code related to generating the results for the publication
-├── processing/           # Code to load EEG data, process it, and extract relevant features
-├── qc/                   # Quality control
-├── supportFunc/          # Re-usable support functions
-├── toolboxes/            # Dependencies
-└── archive/              # Old stuff
+├── code/                 # All analysis code (BIDS convention)
+│   ├── analysis/         # Code related to generating the results for the publication
+│   ├── processing/       # Code to load EEG data, process it, and extract relevant features
+│   ├── qc/               # Quality control
+│   ├── supportfunc/      # Re-usable support functions
+│   ├── toolboxes/        # Dependencies
+│   └── archive/          # Old stuff
+├── rawdata/              # BIDS raw data metadata (data itself stored separately)
+└── sourcedata/           # BIDS source data placeholder (data itself stored separately)
 ```
 
 ## License
