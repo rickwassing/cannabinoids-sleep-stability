@@ -72,7 +72,7 @@ cfg.this_host = this_host;
 cfg.derivativeout = 'EEG-preproc';
 cfg.kv.desc = {'preproc'};
 cfg.kv.filetype = {'eeg'};
-errors = run_processing_section(Proc, Files, cfg);
+errors = css_section(Proc, Files, cfg);
 
 %% =========================================================================
 % PROCESSING: Calculate metrics on entire recording
@@ -99,7 +99,7 @@ cfg.this_host = this_host;
 cfg.derivativeout = 'EEG-processed';
 cfg.kv.desc = {'spindlefdz', 'spindlefli', 'spindlewam', 'sigma', 'theta', 'delta'};
 cfg.kv.filetype = {'boxcar', 'boxcar', 'boxcar', 'pow', 'pow', 'pow'};
-errors = run_processing_section(Proc, Files, cfg);
+errors = css_section(Proc, Files, cfg);
 
 %% =========================================================================
 % INSPECT: Inspect spindles
@@ -110,7 +110,7 @@ cfg.do_parallel = do_parallel;
 cfg.hosts = hosts;
 cfg.this_host = this_host;
 cfg.derivativeout = 'n/a';
-errors = run_processing_section(Proc, Files, cfg);
+errors = css_section(Proc, Files, cfg);
 
 %% =========================================================================
 % PROCESSING: Segment
@@ -136,7 +136,7 @@ cfg.this_host = this_host;
 cfg.derivativeout = 'EEG-segmented';
 cfg.kv.desc = {'<desc>nrembout', '<desc>prerembout', '<desc>nremarobout'};
 cfg.kv.filetype = {'<filetype>', '<filetype>', '<filetype>'};
-errors = run_processing_section(Proc, Files, cfg);
+errors = css_section(Proc, Files, cfg);
 %% -------------------------------------------------------------------------
 % Segment in 300-second (or longer) bouts of continuous N2 sleep (allowing
 % 1 epoch of non-stage-2 sleep).
@@ -150,7 +150,7 @@ cfg.this_host = this_host;
 cfg.derivativeout = 'EEG-segmented';
 cfg.kv.desc = {'hrnrembout', 'hrprerembout', 'hrnremarobout'};
 cfg.kv.filetype = {'<filetype>', '<filetype>', '<filetype>'};
-errors = run_processing_section(Proc, Files, cfg);
+errors = css_section(Proc, Files, cfg);
 
 Proc = {'extractnrembouts', 'extractprerembouts', 'extractnremarousals'};
 Files = dir('derivatives/EEG-preproc/sub-*/ses-*/sub-*desc-preprocecg_ecg*.set'); % HR files
@@ -161,7 +161,7 @@ cfg.this_host = this_host;
 cfg.derivativeout = 'EEG-segmented';
 cfg.kv.desc = {'ecgnrembout', 'ecgprerembout', 'ecgnremarobout'};
 cfg.kv.filetype = {'<filetype>', '<filetype>', '<filetype>'};
-errors = run_processing_section(Proc, Files, cfg);
+errors = css_section(Proc, Files, cfg);
 
 %% =========================================================================
 % PROCESSING: Get ISF parameters (amplitude, mean frequency, bandwidth)
@@ -178,7 +178,7 @@ cfg.this_host = this_host;
 cfg.derivativeout = 'EEG-output-fstlvl';
 cfg.kv.desc = {'a1cnormsigma', 'a1cabssigma'};
 cfg.kv.filetype = {'fstlvl', 'fstlvl'};
-errors = run_processing_section(Proc, Files, cfg);
+errors = css_section(Proc, Files, cfg);
 
 %% =========================================================================
 % PROCESSING: Perform cross correlation between sigma and HR
@@ -193,7 +193,7 @@ cfg.this_host = this_host;
 cfg.derivativeout = 'EEG-output-fstlvl';
 cfg.kv.desc = {'nremboutxcorr120s'};
 cfg.kv.filetype = {'fstlvl'};
-errors = run_processing_section(Proc, Files, cfg);
+errors = css_section(Proc, Files, cfg);
 
 %% =========================================================================
 % ANALYSE:

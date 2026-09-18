@@ -170,7 +170,7 @@ for ri = 1:length(rois)
 
     fprintf('---------------------\n');
     fprintf('%s\n', roi);
-    
+
     switch roi
         case 'fz'
             T_this = T_fz;
@@ -185,7 +185,6 @@ for ri = 1:length(rois)
     end
 
     T_this.(delay) = correct_phase_by_empirical_cdf(T_this.(delay));
-
 
     pcfg.idx.pbo.aw = ismember(T_this.aro_type, {'arousal', 'arousalemg'}) & ismember(T_this.ses, {'placebo'}) & T_this.is_awakening == 'true';
     pcfg.idx.pbo.cs = ismember(T_this.aro_type, {'arousal', 'arousalemg'}) & ismember(T_this.ses, {'placebo'}) & T_this.is_awakening == 'false';
@@ -212,204 +211,19 @@ for ri = 1:length(rois)
 
     close all
     % Circ stats
-    r = 0;
-    for fld = {'aw', 'cs'}
-
-        fprintf('---------------------\n');
-        fprintf('%s\n', fld{:});
-
-        for cond = {'pbo', 'etc'}
-            r = r+1;
-            delay = 'phase_d0';
-            AData = within_chan_circ_mean(T_this(pcfg.idx.(cond{:}).(fld{:}), :), delay);
-            
-            [pval, m] = circ_rtest(AData);
-            fprintf('Rayleigh test for non-uniformity of ''%s'' arousals in ''%s'' condition (m = %.2f, p = %.3f).\n', fld{:}, cond{:}, m, pval)
-            Circ.(['Ray_', roi]){r} = parsepvalue(pval);
-
-            [pval, T] = circ_hrtest(AData);
-            fprintf('Hermans-Rasson test for non-uniformity of ''%s'' arousals in ''%s'' condition (m = %.2f, p = %.3f).\n', fld{:}, cond{:}, T, pval)
-            Circ.(['HR_', roi]){r} = parsepvalue(pval);
-
-            [pval, dip, xl, xu] = circ_diptest(AData);
-            fprintf('Dip-test of ''%s'' arousals in ''%s'' condition (dip = %.2f, p = %.3f, limits %.2f - %.2f).\n', fld{:}, cond{:}, dip, pval, circ_rad2deg360(xl), circ_rad2deg360(xu))
-            Circ.(['Dip_', roi]){r} = parsepvalue(pval);
-
-            WData = -pi:pi/180:pi;
-            KData = circ_ksdensity(AData, WData, [-pi, pi]);
-            [pks, plocs, pwidth] = findpeaks(KData, 'SortStr','descend');
-            if pval > 0.05
-                fprintf('Unimodal peak at %.2f (%.2f - %.2f) degrees\n', circ_rad2deg360(WData(plocs(1))), circ_rad2deg360(WData(plocs(1))-pwidth(1)*mean(diff(WData))), circ_rad2deg360(WData(plocs(1))+pwidth(1)*mean(diff(WData))))
-            else
-                fprintf('Multimodal peaks at %.2f (%.2f - %.2f) and %.2f (%.2f - %.2f) degrees\n', ...
-                    circ_rad2deg360(WData(plocs(1))), circ_rad2deg360(WData(plocs(1))-pwidth(1)*mean(diff(WData))), circ_rad2deg360(WData(plocs(1))+pwidth(1)*mean(diff(WData))), ...
-                    circ_rad2deg360(WData(plocs(2))), circ_rad2deg360(WData(plocs(2))-pwidth(2)*mean(diff(WData))), circ_rad2deg360(WData(plocs(2))+pwidth(2)*mean(diff(WData))))
-            end
-
-            fprintf('\n')
-        end
-    end
-
-    for fld = {'aw', 'cs'}
-        [pval, k] = circ_kuipertest(...
-            within_chan_circ_mean(T_this(pcfg.idx.pbo.(fld{:}), :), delay), ...
-            within_chan_circ_mean(T_this(pcfg.idx.etc.(fld{:}), :), delay), ...
-            pcfg.nbins, false);
-        fprintf('Kuiper-test indicated phase angles are different between PBO and ETC for ''%s'' arousals (k = %.2f, p = %.3f).\n', fld{:}, k, pval)
-
-        A1 = within_chan_circ_mean(T_this(pcfg.idx.pbo.(fld{:}), :), delay);
-        A2 = within_chan_circ_mean(T_this(pcfg.idx.etc.(fld{:}), :), delay);
-        [pval, U2_obs, U2_H0] = watsons_U2_perm_test(A1,A2, 200);
-        fprintf('Nonparametric permutation test based on Watson''s U2 indicated phase angles are/are not different between PBO and ETC for ''%s'' arousals (U2 = %.2f, p = %.3f).\n', fld{:}, U2_obs, pval)
-
-    end
+    Circ = run_circular_stats_tests(T_this, pcfg, roi, delay, Circ);
 
     % -------------------------------------------------------------------------
-    % Create new figure
-    Fig = figure('Color', 'w');
-    Fig.Units = 'centimeters';
-    Fig.Position = [1 12 18 7].*1;
-    % -------------------------------------------------------------------------
-    % Init axes array
-    clear Ax
-    i = 0;
-    % -------------------------------------------------------------------------
-    % Plot EEG trace for panel A
-    if strcmpi(roi, 'fz')
-        i = i+1;
-        Ax(i) = plot_fig2_eegtrace(Fig, EEG, 'aw', pcfg); %#ok<*SAGROW>
-        Ax(i).Position = [-0.015 1-0.2 0.47 0.2]+pcfg.margin;
-        % Plot sigma power
-        i = i+1;
-        Ax(i) = plot_fig2_sigmatrace(Fig, SIG, FSIG, 'aw', pcfg);
-        Ax(i).Position = [-0.015 1-0.37 0.47 0.175]+pcfg.margin;
-    end
-    % -------------------------------------------------------------------------
-    % Plot EEG trace for panel B
-    if strcmpi(roi, 'fz')
-        i = i+1;
-        Ax(i) = plot_fig2_eegtrace(Fig, EEG, 'cs', pcfg);
-        Ax(i).Position = [0.48 1-0.2 0.47 0.2]+pcfg.margin;
-        % Plot sigma power
-        i = i+1;
-        Ax(i) = plot_fig2_sigmatrace(Fig, SIG, FSIG, 'cs', pcfg);
-        Ax(i).Position = [0.48 1-0.37 0.47 0.175]+pcfg.margin;
-    end
-    % -------------------------------------------------------------------------
-    % Topoplot of selected channels
-    i = i+1;
-    % Create axes
-    Ax(i) = axes(Fig, 'NextPlot', 'add', 'Position', [0 0.175 0.1 0.225]);
-    topoplot(Chans_this, chans.locs, ...
-        'style', 'blank', ...
-        'electrodes', 'off', ...
-        'emarker', {'.', 'k', 12, 1}, ...
-        'emarkercolors', {[0, 0, 0]}, ...
-        'hlinewidth', 1, ...
-        'hcolor', [0.5, 0.5, 0.5], ...
-        'whitebk', 'on');
-
-    % -------------------------------------------------------------------------
-    % Plot averaged prearousal sigma timeseries between CS and AW arousals for
-    % AWAKENINGS AROUSALS
-    i = i+1;
-    Ax(i) = plot_fig2_avsigmatrace(Fig, T_this, Perms_this, 'aw', pcfg);
-    Ax(i).Position = [0.11 0.22 0.18 0.2]+pcfg.margin;
-    % -------------------------------------------------------------------------
-    % Plot Pr Arousals
-    i = i+1;
-    Ax(i) = plot_fig2_probarousal(Fig, T_this, Perms_this, 'aw', pcfg);
-    Ax(i).Position = [Ax(i-1).Position(1), Ax(i-1).Position(2)+Ax(i-1).Position(4), Ax(i-1).Position(3) 0.1];
-    Ax(i).XLim = Ax(i-1).XLim;
-    Ax(i).XTick = Ax(i-1).XTick;
-
-    % -------------------------------------------------------------------------
-    % Plot averaged prearousal sigma timeseries between CS and AW arousals for
-    % CONTINUED SLEEP AROUSALS
-    i = i+1;
-    Ax(i) = plot_fig2_avsigmatrace(Fig, T_this, Perms_this, 'cs', pcfg);
-    Ax(i).Position = [0.28 0.22 0.18 0.2]+pcfg.margin;
-    % -------------------------------------------------------------------------
-    % Plot Pr Arousals
-    i = i+1;
-    Ax(i) = plot_fig2_probarousal(Fig, T_this, Perms_this, 'cs', pcfg);
-    Ax(i).Position = [Ax(i-1).Position(1), Ax(i-1).Position(2)+Ax(i-1).Position(4), Ax(i-1).Position(3) 0.1];
-    Ax(i).XLim = Ax(i-1).XLim;
-    Ax(i).XTick = Ax(i-1).XTick;
-
-    % -------------------------------------------------------------------------
-    % Phase angle of AWAKENING AROUSALS
-    i = i+1;
-    Ax(i) = plot_fig2_phaseangle(Fig, T_this, 'aw', 'phase_d0', pcfg);
-    Ax(i).Position = [0.5 0.22 0.18 0.3]+pcfg.margin;
-
-    % -------------------------------------------------------------------------
-    % Phase angle of CONT. SLEEP AROUSALS
-    i = i+1;
-    Ax(i) = plot_fig2_phaseangle(Fig, T_this, 'cs', 'phase_d0', pcfg);
-    Ax(i).Position = [0.67 0.22 0.18 0.3]+pcfg.margin;
-
-    % -------------------------------------------------------------------------
-    % Instantaneous amplitude of ISF
-    Ax(i) = plot_fig2_instamp(Fig, T_this, pcfg);
-    Ax(i).Position = [0.86 0.22 0.11 0.3]+pcfg.margin;
-
-    % -------------------------------------------------------------------------
-    % Panel labels
-    plot_fig2_panellabels(Fig, roi);
-
-    if strcmpi(roi, 'fz')
-        Ax(2).Colormap = Ax(2).UserData.CMap;
-        Ax(4).Colormap = Ax(4).UserData.CMap;
-    end
-    exportgraphics(Fig, sprintf('./figures/fig_prearousal_%s.png', roi), 'Resolution', 600)
+    % Create, assemble, and export Figure 2 for this region of interest
+    plot_fig2_full(roi, T_this, Perms_this, Chans_this, chans, EEG, SIG, FSIG, pcfg);
 
 end
 
 disp('done')
 
 %%
-
-Fig = figure('Color', 'w');
-Fig.Units = 'centimeters';
-Fig.Position = [1 12 8.5 16].*1;
-
-clear Ax
-i = 0;
-
-i = i+1;
-Ax(i) = plot_fig2_phaseangle(Fig, T_this, 'aw', 'phase_d0', pcfg);
-Ax(i).OuterPosition = [0 0.75 0.5 0.25];
-
-i = i+1;
-Ax(i) = plot_fig2_phaseangle(Fig, T_this, 'cs', 'phase_d0', pcfg);
-Ax(i).OuterPosition = [0.5 0.75 0.5 0.25];
-
-i = i+1;
-Ax(i) = plot_fig2_phaseangle(Fig, T_this, 'aw', 'phase_d4', pcfg);
-Ax(i).OuterPosition = [0 0.5 0.5 0.25];
-
-i = i+1;
-Ax(i) = plot_fig2_phaseangle(Fig, T_this, 'cs', 'phase_d4', pcfg);
-Ax(i).OuterPosition = [0.5 0.5 0.5 0.25];
-
-i = i+1;
-Ax(i) = plot_fig2_phaseangle(Fig, T_this, 'aw', 'phase_d8', pcfg);
-Ax(i).OuterPosition = [0 0.25 0.5 0.25];
-
-i = i+1;
-Ax(i) = plot_fig2_phaseangle(Fig, T_this, 'cs', 'phase_d8', pcfg);
-Ax(i).OuterPosition = [0.5 0.25 0.5 0.25];
-
-i = i+1;
-Ax(i) = plot_fig2_phaseangle(Fig, T_this, 'aw', 'phase_d12', pcfg);
-Ax(i).OuterPosition = [0 0 0.5 0.25];
-
-i = i+1;
-Ax(i) = plot_fig2_phaseangle(Fig, T_this, 'cs', 'phase_d12', pcfg);
-Ax(i).OuterPosition = [0.5 0 0.5 0.25];
-
-exportgraphics(Fig, './figures/supp_2b_phase-coupling_fz.png', 'Resolution', 600)
+% Supplementary figure: phase-angle polar histograms at increasing delays
+plot_supp_phase_coupling(T_this, pcfg);
 
 %%
 clear ans i pcfg

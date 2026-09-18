@@ -9,7 +9,7 @@ this code was reorganised from its original flat layout.
 
 `main.m` is the top-level orchestration script. It:
 1. Initializes the environment (`css_init.m`) and adds `code/` (and subfolders) to the MATLAB path.
-2. Runs subject-level **PROCESSING** steps via `pipeline/run_processing_section.m`, which dispatches
+2. Runs subject-level **PROCESSING** steps via `pipeline/css_section.m`, which dispatches
    to functions in `subject-level/` (preprocessing, segmentation, spectral-feature extraction) and
    `firstlevel-outcomes/` (functions that also compute and save a first-level outcome file) using a
    `Proc`/`Files`/`cfg` pattern.

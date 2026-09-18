@@ -1,64 +1,22 @@
-function plot_isf_topography(type, varargin)
-
-
-chanlocs = template_to_chanlocs(which('GSN-HydroCel-257.sfp'));
-[~, system] = ishdeeg({chanlocs.labels});
-incl = hdeeg_scalpchannels(system);
-chanlocs = chanlocs(ismember({chanlocs.labels}, incl));
-chanlocs = channel_clusters(chanlocs, 'mff');
-
-% if nargin > 1
-%     idx_chan = find(ismember({chanlocs.labels}, varargin{1}));
-% else
-%     idx_chan = 1:length(chanlocs);
-% end
-
-% Load group-level results, colormap, and chanlocs
-load(sprintf('group-level/a1c_pairttest_cmass/%ssigma/glm.mat', type)) %#ok<LOAD>
-grpx = load('group-level/a1c_pairttest_cmass/xcorr/glm.mat');
-GLMXC = grpx.GLM;
-load('colormap_roma.mat') %#ok<LOAD>
-load('colormap_batlow.mat') %#ok<LOAD>
-BOUTS.a = readtable('group-level/nrembout_number.csv');
-BOUTS.b = readtable('group-level/nrembout_duration.csv');
-% Set limits
-switch type
-    case 'abs'
-        AmpYLim = [0, 2];
-    case 'norm'
-        AmpYLim = [0, 4];
-end
-% Load example dataset
-SIGMA = LoadDataset('derivatives/EEG-segmented/sub-r005/ses-etc120/sub-r005_ses-etc120_task-psg_desc-sigmanrembout_pow.set', 'all');
-EEG = LoadDataset('derivatives/EEG-processed/sub-r005/ses-etc120/sub-r005_ses-etc120_task-psg_desc-sigma_pow.set', 'all');
-HR = LoadDataset('derivatives/EEG-preproc/sub-r005/ses-etc120/sub-r005_ses-etc120_task-psg_desc-preprochr_hr.set', 'all');
-bouts = getnrembouts(css_eeglab2hypnogram(EEG), EEG.srate, 300);
-EEG = pop_select(EEG, 'time', [0, bouts(end, 2)+300]);
-EEG.times = linspace(EEG.xmin, EEG.xmax, EEG.pnts);
-HR = pop_select(HR, 'time', [0, bouts(end, 2)+300]);
-HR.times = linspace(HR.xmin, HR.xmax, HR.pnts);
-% Load data from both groups
-Files = dir(sprintf('derivatives/EEG-output-fstlvl/sub-*/ses-*/sub-*%ssigma*interp_fstlvl.mat', type));
-ISF = [];
-for i = 1:length(Files)
-    if i == 1
-        ISF = LoadDataset(fullfile(Files(i).folder, Files(i).name), 'matrix');
-    else
-        ISF(i) = LoadDataset(fullfile(Files(i).folder, Files(i).name), 'matrix'); %#ok<AGROW>
-    end
-end
-% Cross correlation between Sigma power and HR timeseries
-Files = dir('derivatives/EEG-output-fstlvl/sub-*/ses-*/sub-*_desc-nremboutxcorr120s_fstlvl.mat');
-
-XC = [];
-for i = 1:length(Files)
-    tmp = LoadDataset(fullfile(Files(i).folder, Files(i).name), 'matrix');
-    if isempty(XC)
-        XC = tmp;
-    else
-        XC(i) = tmp; %#ok<AGROW>
-    end
-end
+function plot_isf_topography(type, D)
+% -------------------------------------------------------------------------
+% Draw and export the ISF topography figure (Figure 2, panels A-H) for the
+% given 'type' ('abs' or 'norm'), using the data pre-loaded into 'D' by
+% load_isf_topography_data.m.
+% -------------------------------------------------------------------------
+chanlocs = D.chanlocs;
+GLM = D.GLM;
+GLMXC = D.GLMXC;
+roma = D.roma;
+batlow = D.batlow;
+BOUTS = D.BOUTS;
+AmpYLim = D.AmpYLim;
+SIGMA = D.SIGMA;
+EEG = D.EEG;
+HR = D.HR;
+bouts = D.bouts;
+ISF = D.ISF;
+XC = D.XC;
 % -------------------------------------------------------------------------
 % Create new figure
 close all

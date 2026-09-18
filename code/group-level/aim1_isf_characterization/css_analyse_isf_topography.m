@@ -105,5 +105,7 @@ fprintf('No difference in the time of the night of selected bouts (t(%i) = %.2f,
     mdl.Coefficients.pValue(2))
 
 % Create the figure
-plot_isf_topography('abs')
-plot_isf_topography('norm')
+D = load_isf_topography_data('abs');
+plot_isf_topography('abs', D);
+D = load_isf_topography_data('norm');
+plot_isf_topography('norm', D);

@@ -1,4 +1,4 @@
-function [errors] = run_processing_section(Proc, Files, cfg)
+function [errors] = css_section(Proc, Files, cfg)
 % -------------------------------------------------------------------------
 % Init output variable
 errors = {};
