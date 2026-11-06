@@ -1,5 +1,8 @@
-function bouts = getnrembouts(HYP, srate, cutoff)
+function bouts = getnrembouts(HYP, EEG, cutoff)
 % Output variable bouts are in seconds, cutoff must also be in seconds
+if any(strcmpi({EEG.event.type}, 'boundary'))
+    keyboard
+end
 % -------------------------------------------------------------------------
 % Initialize
 bouts = [];
@@ -35,7 +38,7 @@ for i = 1:size(HYP, 1)
 end
 % -------------------------------------------------------------------------
 % Convert samples to seconds
-bouts = bouts./srate;
+bouts = bouts./EEG.srate;
 % -------------------------------------------------------------------------
 % Remove segments that are less than 'cutoff' duration
 rmidx = diff(bouts') <= cutoff;

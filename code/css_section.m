@@ -37,6 +37,9 @@ for i = 1:length(Files)
     if isfield(kv, 'run')
         kv = rmfield(kv, 'run');
     end
+    % Make sure the fields are in the right order
+    ordfields = {'sub', 'ses', 'task', 'run', 'desc', 'filetype'};
+    kv = orderfields(kv, ordfields(ismember(ordfields, fieldnames(kv))));
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     % Set the output folder name
     if strcmpi(cfg.derivativeout, 'n/a')

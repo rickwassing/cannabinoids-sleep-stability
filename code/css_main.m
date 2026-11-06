@@ -31,7 +31,7 @@ hosts = {...
     'Sleeps-MacBook-Pro.local', true;  ... % MBP
     'mnc.local', true;                 ... % Mac-n-Cheese
     'wimr-hp-z6', true;                ... % Supercomputer #1
-    'WIMR-HP-Z6b', false;               ... % Supercomputer #2
+    'WIMR-HP-Z6b', false;              ... % Supercomputer #2
     'WIMR-HPZ8-01', true;              ... % Supercomputer #3
     'WIMR-SUPERMICRO', false;          ... % SuperMicro
     'WIMR-ZBOOK-01', true;             ... % Neurobiology Laptop
@@ -84,12 +84,7 @@ errors = css_section(Proc, Files, cfg);
 % Save as 'desc-sigma', 'desc-theta', and 'desc-delta'
 % -------------------------------------------------------------------------
 Proc = {...
-    'detectspindlesusingfernandez', ...
-    'detectspindlesusingferrarelli', ...
-    'detectspindlesusingwamsley', ...
     'getsigmapowerusingwavelet', ...
-    'getthetapowerusingwavelet', ...
-    'getdeltapowerusingwavelet', ...
     };
 Files = dir('derivatives/EEG-preproc/sub-*/ses-*/sub-*desc-preproc_eeg.set');
 cfg = struct();
@@ -97,8 +92,8 @@ cfg.do_parallel = do_parallel;
 cfg.hosts = hosts;
 cfg.this_host = this_host;
 cfg.derivativeout = 'EEG-processed';
-cfg.kv.desc = {'spindlefdz', 'spindlefli', 'spindlewam', 'sigma', 'theta', 'delta'};
-cfg.kv.filetype = {'boxcar', 'boxcar', 'boxcar', 'pow', 'pow', 'pow'};
+cfg.kv.desc = {'sigma'};
+cfg.kv.filetype = {'pow'};
 errors = css_section(Proc, Files, cfg);
 
 %% =========================================================================
@@ -137,6 +132,7 @@ cfg.derivativeout = 'EEG-segmented';
 cfg.kv.desc = {'<desc>nrembout', '<desc>prerembout', '<desc>nremarobout'};
 cfg.kv.filetype = {'<filetype>', '<filetype>', '<filetype>'};
 errors = css_section(Proc, Files, cfg);
+
 %% -------------------------------------------------------------------------
 % Segment in 300-second (or longer) bouts of continuous N2 sleep (allowing
 % 1 epoch of non-stage-2 sleep).

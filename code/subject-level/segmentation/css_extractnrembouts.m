@@ -16,7 +16,7 @@ EEG.event = storeoriglatency(EEG.event);
 Thyp = css_eeglab2hypnogram(EEG);
 % -------------------------------------------------------------------------
 % Select EEG during N2 and N3
-nrembouts = getnrembouts(Thyp, EEG.srate, 300); % '300' is minimum bout duration in seconds
+nrembouts = getnrembouts(Thyp, EEG, 300); % '300' is minimum bout duration in seconds
 NREM = pop_select(EEG, 'time', nrembouts);
 NREM = eeg_checkset(NREM, 'eventconsistency');
 NREM.times = NREM.xmin:1/NREM.srate:NREM.xmax; % undo 'pop_select' convertion to milliseconds

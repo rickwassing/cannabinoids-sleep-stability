@@ -1,10 +1,13 @@
 function css_analyse_isf_topography()
 % -------------------------------------------------------------------------
 % Visually inspect the IFS spectra and interpolate bad channels
-Files = dir('derivatives/EEG-output-fstlvl/sub-*/ses-*/sub-*_desc-a1c*sigma_fstlvl.mat');
+Files = dir('derivatives/EEG-output-fstlvl/sub-*/ses-*/sub-h*_desc-a1c*sigma_fstlvl.mat');
 for i = 1:length(Files)
     % Load data
     ISF = LoadDataset(fullfile(Files(i).folder, Files(i).name), 'matrix');
+    chans = strrep({ISF.chanlocs.labels}, 'E', '');
+    chans = strrep(chans, 'Cz', '999');
+    chans = str2double(chans);
     % Interpolate bad channels (from visual inspection)
     switch ISF.filename
         case {'sub-r003_ses-etc120_task-psg_desc-a1cabssigma_fstlvl.mat', 'sub-r003_ses-etc120_task-psg_desc-a1cnormsigma_fstlvl.mat'}
@@ -37,6 +40,34 @@ for i = 1:length(Files)
             ISF = interp_isfspectrum(ISF, badchans);
         case {'sub-r019_ses-etc120_task-psg_desc-a1cabssigma_fstlvl.mat', 'sub-r019_ses-etc120_task-psg_desc-a1cnormsigma_fstlvl.mat'}
             badchans = [45 53 60 77 78 79 87 113 114 178];
+            ISF = interp_isfspectrum(ISF, badchans);
+        case {'sub-h03mh_ses-placebo_task-psg_desc-a1cabssigma_fstlvl.mat', 'sub-h03mh_ses-placebo_task-psg_desc-a1cnormsigma_fstlvl.mat'}
+            badchans = [179 180 181 182];
+            badchans = find(ismember(chans, badchans));
+            ISF = interp_isfspectrum(ISF, badchans);
+        case {'sub-h08ic_ses-placebo_task-psg_desc-a1cabssigma_fstlvl.mat', 'sub-h08ic_ses-placebo_task-psg_desc-a1cnormsigma_fstlvl.mat'}
+            badchans = [210 220];
+            badchans = find(ismember(chans, badchans));
+            ISF = interp_isfspectrum(ISF, badchans);
+        case {'sub-h44sh_ses-placebo_task-psg_desc-a1cabssigma_fstlvl.mat', 'sub-h44sh_ses-placebo_task-psg_desc-a1cnormsigma_fstlvl.mat'}
+            badchans = [90];
+            badchans = find(ismember(chans, badchans));
+            ISF = interp_isfspectrum(ISF, badchans);
+        case {'sub-h55rf_ses-placebo_task-psg_desc-a1cabssigma_fstlvl.mat', 'sub-h55rf_ses-placebo_task-psg_desc-a1cnormsigma_fstlvl.mat'}
+            badchans = [25 32 68 79];
+            badchans = find(ismember(chans, badchans));
+            ISF = interp_isfspectrum(ISF, badchans);
+        case {'sub-h205jp_ses-placebo_task-psg_desc-a1cabssigma_fstlvl.mat', 'sub-h205jp_ses-placebo_task-psg_desc-a1cnormsigma_fstlvl.mat'}
+            badchans = [50 90];
+            badchans = find(ismember(chans, badchans));
+            ISF = interp_isfspectrum(ISF, badchans);
+        case {'sub-h206tw_ses-placebo_task-psg_desc-a1cabssigma_fstlvl.mat', 'sub-h206tw_ses-placebo_task-psg_desc-a1cnormsigma_fstlvl.mat'}
+            badchans = [37];
+            badchans = find(ismember(chans, badchans));
+            ISF = interp_isfspectrum(ISF, badchans);
+        case {'sub-h209kn_ses-placebo_task-psg_desc-a1cabssigma_fstlvl.mat', 'sub-h209kn_ses-placebo_task-psg_desc-a1cnormsigma_fstlvl.mat'}
+            badchans = [16];
+            badchans = find(ismember(chans, badchans));
             ISF = interp_isfspectrum(ISF, badchans);
     end
     % Save as new file
